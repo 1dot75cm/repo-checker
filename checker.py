@@ -115,9 +115,16 @@ def get_commit(page, url_type):
 
     return c
 
-def get_info(url, url_type, branch):
+def get_info(*item):
     ''' 获取页面commit和date
-    return some data'''
+    return datalist'''
+
+    item = item[0]
+    if len(item) == 0 or item[0][0] == "#":
+        return None
+
+    sub_pkg, url_type, name, url = item[0], item[1], item[2], item[3]
+    branch, rpm_com, rpm_date = item[4], item[5], item[6]
 
     type_num = ["3", "4", "5", "6", "7", "9", "10", "11", "12", "14", "20", "21"]
 
@@ -135,7 +142,14 @@ def get_info(url, url_type, branch):
     latest_date = get_date(page, url_type)
     latest_com = get_commit(page, url_type)
 
-    return release_date, release_com, latest_date, latest_com
+    if rpm_date == latest_date or rpm_date >= release_date:
+        status = "normal"
+    else:
+        status = "update" + "[" + url + "]"
+
+    itemlist = [sub_pkg, name, rpm_date, rpm_com, release_date, release_com, latest_date, latest_com, status]
+
+    return output(0, *itemlist)
 
 def output(title=0, *datalist):
     ''' Output.
@@ -179,24 +193,9 @@ if __name__ == "__main__":
     data = load_data("checker_data.csv")
     output(title=1)
 
-    for item in data:
-        if len(item) == 0 or item[0][0] == "#":
-            continue
-
-        sub_pkg, url_type, name, url = item[0], item[1], item[2], item[3]
-        branch, rpm_com, rpm_date = item[4], item[5], item[6]
-
-        try:
-            rel_date, rel_com, lat_date, lat_com = get_info(url, url_type, branch)
-        except KeyboardInterrupt:
-            break
-
-        if rpm_date == lat_date or rpm_date >= rel_date:
-            status = "normal"
-        else:
-            status = "update" + "[" + url + "]"
-
-        itemlist = [sub_pkg, name, rpm_date, rpm_com, rel_date, rel_com, lat_date, lat_com, status]
-        output(0, *itemlist)
+    try:
+        itemlist = list(filter(get_info, data))
+    except KeyboardInterrupt:
+        pass
 
     print("Bye~ %s  Working: %s Sec" % localtime(0))
