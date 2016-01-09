@@ -1,7 +1,10 @@
+#!/usr/bin/env python2
 #coding=utf-8
 '''
 @author: mosquito
 @email: sensor.wen@gmail.com
+@project: Checker
+@github: http://github.com/1dot75cm/repo-checker
 @description: Checker is used to check update for software.
 @version: 0.1
 @history:
@@ -14,6 +17,8 @@ import re
 import time
 import csv
 import json
+import sys
+import os
 
 def load_data(file):
     ''' Load csv file.
@@ -188,9 +193,82 @@ def localtime(trigger=1):
         stop_sec = time.time()
         return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), stop_sec - start_sec
 
+def helper(**opts):
+    ''' display help information. '''
+
+    doclist = list()
+    for i in __doc__.splitlines():
+        if i.startswith("@") and i.find(": ") > -1:
+            doclist.append(i.split(': ')[1])
+    author, email, project, github, description, version = doclist
+
+    if opts['help'] == 1 and opts['err'] == 0:
+        print('''{}
+Usage: {_name} [OPTION]...
+
+Options:
+  -m, --mode=MODE  {_name} work mode: 0 single, 1 thread(default)
+  -f, --file=PATH  {_name} data(csv) full path
+  -h, --help       display this help and exit
+  -v, --version    output version information and exit'''.format(
+            description,
+            _name=project.lower())
+        )
+        sys.exit()
+
+    elif opts['vers'] == 1 and opts['err'] == 0:
+        print('''{} version {}
+Written by {} <{}>
+Report bug: <{}>'''.format(project, version, author, email, github))
+        sys.exit()
+
+    elif opts['file'] == 1 and opts['err'] == 0:
+        if sys.argv[1].startswith("--file="):
+            if os.path.exists(sys.argv[1][7:]):
+                return sys.argv[1][7:]
+            else:
+                print("{}: cannot access '{}': No such file or directory"
+                .format(project, sys.argv[1][7:]))
+        elif sys.argv[1] in ['--file', '-f']:
+            if len(sys.argv) == 2:
+                print("Please enter csv file path.")
+            elif os.path.exists(sys.argv[2]):
+                return sys.argv[2]
+            else:
+                print("{}: cannot access '{}': No such file or directory"
+                .format(project, sys.argv[2]))
+        sys.exit()
+
+    elif opts['mode'] == 1 and opts['err'] == 0:
+        pass
+
+    elif opts['err'] == 1:
+        print('''{_name}: invalid option -- '{}'
+Try '{_name} --help' for more information.'''.format(sys.argv[1:], _name=project.lower()))
+        sys.exit()
+
+    if len(sys.argv) < 2:
+        return "checker_data.csv"
+
+    for argv in sys.argv[1:]:
+        if argv.startswith("-") or argv.startswith("--"):
+            if argv in ['-h', '--help'] and opts['help'] == 0:
+                opts['help'] += 1
+            elif argv in ['-v', '--version'] and opts['vers'] == 0:
+                opts['vers'] += 1
+            elif (argv in ['-f', '--file'] or argv.startswith("--file=")) and opts['file'] == 0:
+                opts['file'] += 1
+            elif (argv in ['-m', '--mode'] or argv.startswith("--mode=")) and opts['mode'] == 0:
+                opts['file'] += 1
+            else:
+                opts['err'] = 1
+    return helper(**opts)
+
+
 # Main
 if __name__ == "__main__":
-    data = load_data("checker_data.csv")
+    csv_path = helper(**{'help': 0, 'vers': 0, 'file': 0, 'mode': 0, 'err': 0})
+    data = load_data(csv_path)
     output(title=1)
 
     try:
