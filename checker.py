@@ -6,12 +6,15 @@
 @project: Checker
 @github: http://github.com/1dot75cm/repo-checker
 @description: Checker is used to check update for software.
-@version: 0.1
+@version: 0.2
 @history:
+    0.2 - Add help info, use multithread (2016.01.10)
     0.1 - Initial version (2016.01.05)
 '''
 
 from __future__ import print_function
+from threading  import Thread
+from Queue      import Queue
 import urllib
 import re
 import time
@@ -194,8 +197,10 @@ def localtime(trigger=1):
         return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), stop_sec - start_sec
 
 def helper(**opts):
-    ''' display help information. '''
+    ''' display help information.
+    return csv_path, thread_num'''
 
+    thread_num = 10
     doclist = list()
     for i in __doc__.splitlines():
         if i.startswith("@") and i.find(": ") > -1:
@@ -207,7 +212,7 @@ def helper(**opts):
 Usage: {_name} [OPTION]...
 
 Options:
-  -m, --mode=MODE  {_name} work mode: 0 single, 1 thread(default)
+  -n, --number=NUM {_name} work number of thread(default: 10)
   -f, --file=PATH  {_name} data(csv) full path
   -h, --help       display this help and exit
   -v, --version    output version information and exit'''.format(
@@ -222,10 +227,10 @@ Written by {} <{}>
 Report bug: <{}>'''.format(project, version, author, email, github))
         sys.exit()
 
-    elif opts['file'] == 1 and opts['err'] == 0:
+    elif opts['file'] == 1 and opts['num'] == 0 and opts['err'] == 0:
         if sys.argv[1].startswith("--file="):
             if os.path.exists(sys.argv[1][7:]):
-                return sys.argv[1][7:]
+                return sys.argv[1][7:], thread_num
             else:
                 print("{}: cannot access '{}': No such file or directory"
                 .format(project, sys.argv[1][7:]))
@@ -233,14 +238,26 @@ Report bug: <{}>'''.format(project, version, author, email, github))
             if len(sys.argv) == 2:
                 print("Please enter csv file path.")
             elif os.path.exists(sys.argv[2]):
-                return sys.argv[2]
+                return sys.argv[2], thread_num
             else:
                 print("{}: cannot access '{}': No such file or directory"
                 .format(project, sys.argv[2]))
         sys.exit()
 
-    elif opts['mode'] == 1 and opts['err'] == 0:
-        pass
+    elif opts['num'] == 1 and opts['file'] == 0 and opts['err'] == 0:
+        if sys.argv[1].startswith("--number="):
+            if str.isdigit(sys.argv[1][9:]):
+                return "checker_data.csv", int(sys.argv[1][9:])
+            else:
+                print("error, please enter number of threads.")
+        elif sys.argv[1] in ['--number', '-n']:
+            if len(sys.argv) == 2:
+                print("Please enter number of threads.")
+            elif str.isdigit(sys.argv[2]):
+                return "checker_data.csv", int(sys.argv[2])
+            else:
+                print("error, please enter number of threads.")
+        sys.exit()
 
     elif opts['err'] == 1:
         print('''{_name}: invalid option -- '{}'
@@ -248,7 +265,7 @@ Try '{_name} --help' for more information.'''.format(sys.argv[1:], _name=project
         sys.exit()
 
     if len(sys.argv) < 2:
-        return "checker_data.csv"
+        return "checker_data.csv", thread_num
 
     for argv in sys.argv[1:]:
         if argv.startswith("-") or argv.startswith("--"):
@@ -258,21 +275,45 @@ Try '{_name} --help' for more information.'''.format(sys.argv[1:], _name=project
                 opts['vers'] += 1
             elif (argv in ['-f', '--file'] or argv.startswith("--file=")) and opts['file'] == 0:
                 opts['file'] += 1
-            elif (argv in ['-m', '--mode'] or argv.startswith("--mode=")) and opts['mode'] == 0:
-                opts['file'] += 1
+            elif (argv in ['-n', '--number'] or argv.startswith("--number=")) and opts['num'] == 0:
+                opts['num'] += 1
             else:
                 opts['err'] = 1
     return helper(**opts)
 
+def working(q):
+    ''' get content from queue. '''
+
+    while True:
+        value = [q.get(),]
+        list(filter(get_info, value))
+        q.task_done()
+
+def running(Num=10, *data):
+    ''' Mutilthreads test: 1, 569s; 5, 107s; 10, 54s; 15, 37s
+    create threads, and put data to queue. '''
+
+    q = Queue()
+
+    for i in range(Num):
+        t = Thread(target=working, args=(q,))
+        t.setDaemon(True)
+        t.start()
+
+    for value in data:
+        q.put(value)
+
+    q.join()
+
 
 # Main
 if __name__ == "__main__":
-    csv_path = helper(**{'help': 0, 'vers': 0, 'file': 0, 'mode': 0, 'err': 0})
+    csv_path, thread_num = helper(**{'help': 0, 'vers': 0, 'file': 0, 'num': 0, 'err': 0})
     data = load_data(csv_path)
     output(title=1)
 
     try:
-        itemlist = list(filter(get_info, data))
+        running(thread_num, *data)
     except KeyboardInterrupt:
         pass
 
