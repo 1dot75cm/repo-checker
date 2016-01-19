@@ -22,6 +22,7 @@ import csv
 import json
 import sys
 import os
+import argparse
 
 def load_data(file):
     ''' Load csv file.
@@ -62,8 +63,6 @@ def get_date(page, url_type):
     time_format = "%Y-%m-%d"
     pattern = r'.*datetime="(.*)T'
 
-#    if url_type in ["1", "3"]:
-#        pattern = r'.*datetime="(.*)T'
     if url_type in ["4", "6", "14"]:
         pattern = r'([0-9]{4}-[0-9]{1,2}-[0-9]{1,2})'
     elif url_type == "5":
@@ -100,7 +99,7 @@ def get_date(page, url_type):
         d = re.search(pattern, page, re.M).group(1)
         t = time.strptime(d, time_format)
         short_time = time.strftime("%y%m%d", t)
-    except AttributeError, TypeError:
+    except (AttributeError, TypeError):
         short_time = "None"
 
     return short_time
@@ -118,7 +117,7 @@ def get_commit(page, url_type):
 
     try:
         c = re.search(pattern, page, re.M).group(1)
-    except AttributeError, TypeError:
+    except (AttributeError, TypeError):
         c = "None"
 
     return c
@@ -196,90 +195,55 @@ def localtime(trigger=1):
         stop_sec = time.time()
         return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), stop_sec - start_sec
 
-def helper(**opts):
+def helper():
     ''' display help information.
     return csv_path, thread_num'''
 
     thread_num = 10
+    data_file = 'checker_data.csv'
     doclist = list()
+
     for i in __doc__.splitlines():
         if i.startswith("@") and i.find(": ") > -1:
             doclist.append(i.split(': ')[1])
-    author, email, project, github, description, version = doclist
+    _author, _email, _project, _github, _description, _version = doclist
 
-    if opts['help'] == 1 and opts['err'] == 0:
-        print('''{}
-Usage: {_name} [OPTION]...
+    parser = argparse.ArgumentParser(description=_description)
 
-Options:
-  -n, --number=NUM {_name} work number of thread(default: 10)
-  -f, --file=PATH  {_name} data(csv) full path
-  -h, --help       display this help and exit
-  -v, --version    output version information and exit'''.format(
-            description,
-            _name=project.lower())
-        )
+    parser.add_argument('-n', '--number', metavar='NUM', type=int,
+                        dest='numbers', action='store',
+                        help='{_name} work number of thread(default: 10)'.format(
+                            _name=_project.lower())
+                       )
+
+    parser.add_argument('-f', '--file', metavar='PATH',
+                        dest='files', action='store',
+                        help='{_name} data(csv) full path'.format(
+                            _name=_project.lower())
+                       )
+
+    parser.add_argument('-v', '--version', dest='version', action='store_true',
+                        help='output version information and exit')
+
+    args = parser.parse_args()
+
+    if args.version:
+        print('{} version {}\nWritten by {} <{}>\nReport bug: <{}>'.format(
+                 _project, _version, _author, _email, _github)
+             )
         sys.exit()
 
-    elif opts['vers'] == 1 and opts['err'] == 0:
-        print('''{} version {}
-Written by {} <{}>
-Report bug: <{}>'''.format(project, version, author, email, github))
+    if args.files and os.path.exists(args.files):
+        data_file = args.files
+    elif args.files is not None:
+        print("{}: cannot access '{}': No such file or directory"
+            .format(_project, args.files))
         sys.exit()
 
-    elif opts['file'] == 1 and opts['num'] == 0 and opts['err'] == 0:
-        if sys.argv[1].startswith("--file="):
-            if os.path.exists(sys.argv[1][7:]):
-                return sys.argv[1][7:], thread_num
-            else:
-                print("{}: cannot access '{}': No such file or directory"
-                .format(project, sys.argv[1][7:]))
-        elif sys.argv[1] in ['--file', '-f']:
-            if len(sys.argv) == 2:
-                print("Please enter csv file path.")
-            elif os.path.exists(sys.argv[2]):
-                return sys.argv[2], thread_num
-            else:
-                print("{}: cannot access '{}': No such file or directory"
-                .format(project, sys.argv[2]))
-        sys.exit()
+    if args.numbers:
+        thread_num = args.numbers
 
-    elif opts['num'] == 1 and opts['file'] == 0 and opts['err'] == 0:
-        if sys.argv[1].startswith("--number="):
-            if str.isdigit(sys.argv[1][9:]):
-                return "checker_data.csv", int(sys.argv[1][9:])
-            else:
-                print("error, please enter number of threads.")
-        elif sys.argv[1] in ['--number', '-n']:
-            if len(sys.argv) == 2:
-                print("Please enter number of threads.")
-            elif str.isdigit(sys.argv[2]):
-                return "checker_data.csv", int(sys.argv[2])
-            else:
-                print("error, please enter number of threads.")
-        sys.exit()
-
-    elif opts['err'] == 1:
-        print('''{_name}: invalid option -- '{}'
-Try '{_name} --help' for more information.'''.format(sys.argv[1:], _name=project.lower()))
-        sys.exit()
-
-    if len(sys.argv) < 2:
-        return "checker_data.csv", thread_num
-
-    for argv in sys.argv[1:]:
-        if argv.startswith("-") or argv.startswith("--"):
-            if argv in ['-h', '--help'] and opts['help'] == 0:
-                opts['help'] += 1
-            elif argv in ['-v', '--version'] and opts['vers'] == 0:
-                opts['vers'] += 1
-            elif (argv in ['-f', '--file'] or argv.startswith("--file=")) and opts['file'] == 0:
-                opts['file'] += 1
-            elif (argv in ['-n', '--number'] or argv.startswith("--number=")) and opts['num'] == 0:
-                opts['num'] += 1
-            else:
-                opts['err'] = 1
-    return helper(**opts)
+    return data_file, thread_num
 
 def working(q):
     ''' get content from queue. '''
@@ -306,9 +270,8 @@ def running(Num=10, *data):
     q.join()
 
 
-# Main
 if __name__ == "__main__":
-    csv_path, thread_num = helper(**{'help': 0, 'vers': 0, 'file': 0, 'num': 0, 'err': 0})
+    csv_path, thread_num = helper()
     data = load_data(csv_path)
     output(title=1)
 
