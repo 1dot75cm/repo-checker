@@ -16,9 +16,9 @@
 #0,1,fcitx-libpinyin,https://github.com/fcitx/fcitx-libpinyin,master,1234567,141107
 #0,1,ibus-libpinyin,https://github.com/epico/ibus-libpinyin,master,1234567,141201
 
-0,1,fcitx,https://github.com/fcitx/fcitx,master,bf10b85,150526,fcitx-4.2.9-1.fc22.src.rpm
+0,1,fcitx,https://github.com/fcitx/fcitx,master,c49de76,151222,fcitx-4.2.9.1-1.fc23.src.rpm
 1,1,opencc,https://github.com/BYVoid/OpenCC,master,e3951b6,150820,opencc-1.0.3-1.gite3951b6.fc22.src.rpm
-1,1,fcitx-qt5,https://github.com/fcitx/fcitx-qt5,master,73337c5,150814,fcitx-qt5-1.0.4-2.git73337c5.fc22.src.rpm
+1,1,fcitx-qt5,https://github.com/fcitx/fcitx-qt5,master,3726be6,151222,fcitx-qt5-1.0.5-1.git3726be6.fc23.src.rpm
 #1,1,fcitx-configtool,https://github.com/fcitx/fcitx-configtool,master,1234567,141209
 #1,1,kcm-fcitx,https://github.com/fcitx/kcm-fcitx,master,1234567,141209
 #1,1,fcitx-ui-light,https://github.com/fcitx/fcitx-ui-light,master,1234567,120305,el7
@@ -35,35 +35,35 @@
 #1,2,glog,https://google-glog.googlecode.com,None,None,140717,el7
 #1,1,gflags,https://github.com/schuhschuh/gflags,feature/%2383-alternative-namespace,1234567,140717,el7
 
-0,1,grub4dos,https://github.com/chenall/grub4dos,0.4.6a,c6048e8,151118,grub4dos-0.4.6a.20151118-1.gitc6048e8.fc23.src.rpm
-0,1,bcloud,https://github.com/LiuLang/bcloud,master,75fab30,150909,bcloud-3.8.1-3.git75fab30.fc23.src.rpm
+0,1,grub4dos,https://github.com/chenall/grub4dos,0.4.6a,8a69be9,160114,grub4dos-0.4.6a.20160114-1.git8a69be9.fc23.src.rpm
+0,1,bcloud,https://github.com/LiuLang/bcloud,master,4b54e0f,160102,bcloud-3.8.2-1.git4b54e0f.fc23.src.rpm
 0,1,screenfetch,https://github.com/KittyKatt/screenFetch,master,22e5bee,151204,screenfetch-3.7.0-3.git22e5bee.fc23.src.rpm
-0,1,xware-desktop,https://github.com/Xinkai/XwareDesktop,master,2baa049,150907,xware-desktop-0.13-2.git2baa049.fc22.src.rpm
+0,1,xware-desktop,https://github.com/Xinkai/XwareDesktop,master,b77d20b,151221,xware-desktop-0.13-3.gitb77d20b.fc23.src.rpm
 
 0,1,kwplayer,https://github.com/LiuLang/kwplayer,master,d623733,150920,kwplayer-3.5.2-3.gitd623733.fc23.src.rpm
 1,3,python-mutagen,https://bitbucket.org/lazka/mutagen/downloads,None,d630a68,150910,python-mutagen-1.31-1.fc22.src.rpm
 1,1,python3-xlib,https://github.com/LiuLang/python3-xlib,master,e68a323,141113,python3-xlib-0.15-1.gite68a323.fc22.src.rpm
 1,1,python3-keybinder,https://github.com/LiuLang/python3-keybinder,master,1f633d0,141120,python3-keybinder-1.1.2-1.git1f633d0.fc22.src.rpm
-1,1,python-html2text,https://github.com/Alir3z4/html2text,master,9157181,151104,python-html2text-2015.11.4-1.git9157181.fc23.src.rpm
+1,1,python-html2text,https://github.com/Alir3z4/html2text,master,0c70c8f,160108,python-html2text-2016.1.8-1.git0c70c8f.fc23.src.rpm
 
 0,1,pointdownload,https://github.com/PointTeam/PointDownload,develop,cd07f1d,150507,pointdownload-1.2.0-2.gitcd07f1d.fc22.src.rpm
 0,1,simplescreenrecorder,https://github.com/MaartenBaert/ssr,master,c580a19,151205,simplescreenrecorder-0.3.6-1.gitc580a19.fc23.src.rpm
-0,6,youdao-dict,http://cidian.youdao.com/index-linux.html,None,None,150101,youdao-dict-1.0.2-2.fc22.src.rpm
-0,1,obs-studio,https://github.com/jp9000/obs-studio,master,725a36b,151204,obs-studio-0.12.3-1.git725a36b.fc23.src.rpm
+0,6,youdao-dict,http://cidian.youdao.com/index-linux.html,None,None,151230,youdao-dict-1.1.0-1.fc23.src.rpm
+0,1,obs-studio,https://github.com/jp9000/obs-studio,master,2c8887b,151212,obs-studio-0.12.4-1.git2c8887b.fc23.src.rpm
 
-0,7,opera-stable,http://ftp.opera.com/pub/opera/desktop,None,None,151207,opera-stable-34.0.2036.25-2.net.src.rpm
-0,7,opera-beta,http://ftp.opera.com/pub/opera-beta,None,None,151203,opera-beta-34.0.2036.24-2.net.src.rpm
-0,7,opera-developer,http://ftp.opera.com/pub/opera-developer,None,None,151210,opera-developer-36.0.2072.0-2.net.src.rpm
-0,1,freshplayerplugin,https://github.com/i-rinat/freshplayerplugin,master,3c6567a,151129,freshplayerplugin-0.3.3-1.git3c6567a.fc23.src.rpm
+0,7,opera-stable,http://ftp.opera.com/pub/opera/desktop,None,None,160111,opera-stable-34.0.2036.47-1.net.src.rpm
+0,7,opera-beta,http://ftp.opera.com/pub/opera-beta,None,None,160114,opera-beta-35.0.2066.23-1.net.src.rpm
+0,7,opera-developer,http://ftp.opera.com/pub/opera-developer,None,None,160113,opera-developer-36.0.2106.0-1.net.src.rpm
+0,1,freshplayerplugin,https://github.com/i-rinat/freshplayerplugin,master,2b06d00,151220,freshplayerplugin-0.3.4-1.git2b06d00.fc23.src.rpm
 
 0,1,shadowsocks,https://github.com/mengskysama/shadowsocks-rm,feature-ota,767b921,151216,python-shadowsocks-2.8.3-1.git767b921.fc23.src.rpm
-0,1,shadowsocks-qt5,https://github.com/librehat/shadowsocks-qt5,master,7ec8a63,151109,shadowsocks-qt5-2.6.0-1.git7ec8a63.fc23.src.rpm
-1,1,libQtShadowsocks,https://github.com/librehat/libQtShadowsocks,master,3c3aa83,151217,libQtShadowsocks-1.8.2-1.git3c3aa83.fc23.src.rpm
+0,1,shadowsocks-qt5,https://github.com/librehat/shadowsocks-qt5,master,ba70fd1,160110,shadowsocks-qt5-2.6.1-1.gitba70fd1.fc23.src.rpm
+1,1,libQtShadowsocks,https://github.com/librehat/libQtShadowsocks,master,d2c76c5,160113,libQtShadowsocks-1.8.4-1.gitd2c76c5.fc23.src.rpm
 
 0,5,tragtor,http://repository.mein-neues-blog.de:9000,None,None,150721,tragtor-0.9.2-1.fc23.src.rpm
 0,1,doubanfm-qt,https://github.com/zonyitoo/doubanfm-qt,master,826e8a2,151205,doubanfm-qt-2.2-2.git826e8a2.fc23.src.rpm
-0,1,moonplayer,https://github.com/coslyk/moonplayer,master,bbf096e,151128,moonplayer-0.49-1.gitbbf096e.fc23.src.rpm
-0,1,musicbox,https://github.com/darknessomi/musicbox,master,65c2742,150617,musicbox-0.1.5.6-1.git65c2742.fc22.src.rpm
+0,1,moonplayer,https://github.com/coslyk/moonplayer,master,a2005f2,160115,moonplayer-0.54-1.gita2005f2.fc23.src.rpm
+0,1,musicbox,https://github.com/darknessomi/musicbox,master,0d67739,151231,musicbox-0.2.0.8-1.git0d67739.fc23.src.rpm
 
 0,1,deepin-music-player,https://github.com/linuxdeepin/deepin-music,master,c43b01d,150617,deepin-music-player-2.3.0-1.gitc43b01d.fc22.src.rpm
 1,1,deepin-ui,https://github.com/linuxdeepin/deepin-ui,master,8d75806,150701,deepin-ui-1.0.4-1.git8d75806.fc22.src.rpm
@@ -78,8 +78,8 @@
 1,1,deepin-qml-widgets,https://github.com/linuxdeepin/deepin-qml-widgets,master,a864d6f,150701,deepin-qml-widgets-2.3.0-1.gita864d6f.fc22.src.rpm
 1,1,python-xpybutil,https://github.com/BurntSushi/xpybutil,master,8ee7dc4,150318,python-xpybutil-0.0.1-1.git8ee7dc4.fc22.src.rpm
 
-0,1,winetricks,https://github.com/Winetricks/winetricks,master,ca1a031,151213,winetricks-20151116-1.gitca1a031.fc23.src.rpm
-1,1,winetricks-zh,https://github.com/hillwoodroc/winetricks-zh,master,ae55ae9,151220
+0,1,winetricks,https://github.com/Winetricks/winetricks,master,07ba4a0,160113,winetricks-20160109-1.git07ba4a0.fc23.src.rpm
+1,1,winetricks-zh,https://github.com/hillwoodroc/winetricks-zh,master,37e58cf,160111
 
 0,1,deepin-movie,https://github.com/linuxdeepin/deepin-movie,master,53adfc6,150701,deepin-movie-2.2.2-2.git53adfc6.fc22.src.rpm
 #1,1,deepin-menu,https://github.com/linuxdeepin/deepin-menu,master,7557d46,150617
@@ -93,9 +93,9 @@
 
 0,1,baka-mplayer,https://github.com/u8sand/Baka-MPlayer,master,e1df4b4,151202,baka-mplayer-2.0.4-1.gite1df4b4.fc23.src.rpm
 
-0,1,cutegram,https://github.com/Aseman-Land/Cutegram,master,bd3bd34,151209,cutegram-2.7.0-1.gitbd3bd34.fc23.src.rpm
-1,1,libqtelegram-ae,https://github.com/Aseman-Land/libqtelegram-aseman-edition,master,569d31b,151207,libqtelegram-ae-6.0-1.git569d31b.fc23.src.rpm
-1,1,libtelegramqml,https://github.com/Aseman-Land/TelegramQML,master,8c5bafc,151207,libtelegramqml-0.9.1-1.git8c5bafc.fc23.src.rpm
+0,1,cutegram,https://github.com/Aseman-Land/Cutegram,master,1dbe279,160112,cutegram-2.7.1-1.git1dbe279.fc23.src.rpm
+1,1,libqtelegram-ae,https://github.com/Aseman-Land/libqtelegram-aseman-edition,master,4ad3aae,160112,libqtelegram-ae-6.1-1.git4ad3aae.fc23.src.rpm
+1,1,libtelegramqml,https://github.com/Aseman-Land/TelegramQML,master,f7e7ef4,160116,libtelegramqml-0.9.2-1.gitf7e7ef4.fc23.src.rpm
 
 0,8,pacman,https://projects.archlinux.org/pacman.git/refs,None,5780350,150220,pacman-4.2.1-3.git5780350.fc22.src.rpm
 1,1,package-query,https://github.com/archlinuxfr/package-query,master,9305778,150908,package-query-1.6.2-3.git9305778.fc22.src.rpm
@@ -116,21 +116,22 @@
 0,1,tengine,https://github.com/alibaba/tengine,master,7d706f0,150812,tengine-2.1.1-3.modsec_2.9.0.fc22.src.rpm
 
 0,1,ircd-hybrid,https://github.com/ircd-hybrid/ircd-hybrid,master,cf893e3,151120,ircd-hybrid-8.2.11-1.fc23.src.rpm
-0,1,mu,https://github.com/Kreogist/Mu,master,0fdf1c6,151207,mu-0.9.184-1.git0fdf1c6.fc23.src.rpm
+0,1,mu,https://github.com/Kreogist/Mu,master,3fa99a1,160105,mu-0.9.200-1.git3fa99a1.fc23.src.rpm
 
 0,11,ccal,http://ccal.chinesebay.com/ccal/ccal.htm.html,None,None,120304,ccal-2.5.3-1.fc22.src.rpm
 #!0,22,checkinstall,http://asic-linux.com.mx/~izto/checkinstall,None,None,150203,checkinstall-1.6.3-1.fc23.src.rpm
 
 0,12,sandbox,https://gitweb.gentoo.org/proj/sandbox.git/log,master,767beca,151219,sandbox-2.10-1.fc23.src.rpm
 
-0,1,atom,https://github.com/atom/atom,master,473e885,151217,atom-1.3.2-1.git473e885.fc23.src.rpm
+0,1,atom,https://github.com/atom/atom,master,e0dbf94,160114,atom-1.4.0-1.gite0dbf94.fc23.src.rpm
 0,1,brackets,https://github.com/adobe/brackets,master,cf9cf46,151004,brackets-1.5.0-1.fc23.src.rpm
 1,1,brackets-shell,https://github.com/adobe/brackets-shell,master,1363c89,151212
 0,1,vscode,https://github.com/Microsoft/vscode,master,a80232b,151219,vscode-0.10.6-1.fc23.src.rpm
 
-#!0,13,oracle-jdk,http://www.oracle.com/technetwork/java/javase,None,None,151222,oracle-jdk-1.8.0.66-1.net.src.rpm
-0,14,wps-office,http://wps-community.org/downloads,None,None,151221,wps-office-10.1.0.5444-1.a20.net.src.rpm
-#!0,15,wine-qqintl,http://packages.linuxdeepin.com/enterprise/pool/non-free/d/deepinwine-qqintl,None,None,141231,wine-qqintl-0.1.3-1.net.src.rpm
+#!0,13,oracle-jdk8,http://www.oracle.com/technetwork/java/javase,None,None,151222,oracle-jdk8-1.8.0.66-2.net.src.rpm
+#!0,13,oracle-jdk7,http://www.oracle.com/technetwork/java/javase/archive-139210.html,None,None,151222,oracle-jdk7-1.7.0.80-1.net.src.rpm
+0,14,wps-office,http://wps-community.org/downloads,None,None,160113,wps-office-10.1.0.5460-1.a20p1.net.src.rpm
+#!0,15,wine-qqintl,http://packages.deepin.com/deepin/pool/non-free/d/deepinwine-qqintl,None,None,141231,wine-qqintl-0.1.3-2.net.src.rpm
 
 #!0,16,FoxitReader,http://cdn02.foxitsoftware.com/pub/foxit/reader/desktop/linux/1.x/1.1/enu,None,None,141231,FoxitReader-1.1.0-1.fc23.src.rpm,https://github.com/archlinuxcn/repo/commit/ceff4a52428e36beb0ed5d13307df21bfcb554b2
 1,20,qt-installer-frame,http://download.qt.io/official_releases/qt-installer-framework,None,None,150602,qt-installer-framework-2.0.1-1.fc23.src.rpm
