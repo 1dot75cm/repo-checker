@@ -124,7 +124,7 @@
 0,12,sandbox,https://gitweb.gentoo.org/proj/sandbox.git/log,master,767beca,151219,sandbox-2.10-1.fc23.src.rpm
 
 0,1,atom,https://github.com/atom/atom,master,e0dbf94,160114,atom-1.4.0-1.gite0dbf94.fc23.src.rpm
-0,1,brackets,https://github.com/adobe/brackets,master,cf9cf46,151004,brackets-1.5.0-1.fc23.src.rpm
+0,1,brackets,https://github.com/adobe/brackets,master,3df0ac6,160112,brackets-1.6-1.fc23.src.rpm
 1,1,brackets-shell,https://github.com/adobe/brackets-shell,master,1363c89,151212
 0,1,vscode,https://github.com/Microsoft/vscode,master,a80232b,151219,vscode-0.10.6-1.fc23.src.rpm
 
@@ -138,6 +138,8 @@
 
 0,21,pycharm-community,https://data.services.jetbrains.com/products/releases?code=PCP%2PCC&latest=true&type=release,None,None,151223,pycharm-community-5.0.3-1.net.src.rpm
 0,21,pycharm-professional,https://data.services.jetbrains.com/products/releases?code=PCP%2PCC&latest=true&type=release,None,None,151223,pycharm-professional-5.0.3-1.net.src.rpm
+
+0,1,xx-net,https://github.com/XX-net/XX-Net,master,84585b1,160113,xx-net-2.8.10-1.git84585b1.fc23.src.rpm
 
 # Wait
 #0,1,deepin-translator,https://github.com/linuxdeepin/deepin-translator,master,1234567,141231
