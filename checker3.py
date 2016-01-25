@@ -18,7 +18,7 @@ from queue      import Queue
 import urllib.request, urllib.parse, urllib.error
 import re, csv, json
 import time, sys, os
-import argparse
+import argparse, random
 
 class Checker(object):
     ''' check update for software '''
@@ -33,12 +33,30 @@ class Checker(object):
         ''' 获取整个页面数据
         return str '''
 
+        ualist = [
+            'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36',
+            'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.1 Safari/537.36',
+            'Mozilla/5.0 (Windows NT 6.3; rv:41.0) Gecko/20100101 Firefox/41.0',
+            'Mozilla/5.0 (X11; Linux x86_64; rv:43.0) Gecko/20100101 Firefox/43.0',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10; rv:33.0) Gecko/20100101 Firefox/40.0',
+            'Mozilla/5.0 (compatible, MSIE 11, Windows NT 6.3; Trident/7.0;  rv:11.0) like Gecko',
+            'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10) AppleWebKit/537.75.14 (KHTML, like Gecko) Version/7.0.3 Safari/7046A194A'
+        ]
+
+        if Helper.helper(self):
+            header = { 'User-Agent': str(Helper.helper(self)) }
+        else:
+            header = { 'User-Agent': ualist[random.randint(0, len(ualist)-1)] }
+        req = urllib.request.Request(url = _url, headers = header)
+
         if self.url_type == "2":
             return "None Content"
         elif self.url_type == "4":
-            return urllib.request.urlopen(_url).read().decode('gb2312').encode('utf-8')
+            return urllib.request.urlopen(req).read().decode('gb2312').encode('utf-8')
         else:
-            return urllib.request.urlopen(_url).read()
+            return urllib.request.urlopen(req).read()
 
     def get_date(self, _page):
         ''' 获取 date -> 150708
@@ -142,6 +160,7 @@ class Helper(object):
     def __init__(self):
         self.thread_num = 10
         self.data_file = 'checker_data.csv'
+        self.user_agent = None
         self.q = Queue()
 
     def load_data(self):
@@ -214,6 +233,11 @@ class Helper(object):
                                 _name=_project.lower())
                            )
 
+        parser.add_argument('-U', '--user-agent', metavar='AGENT', type=str,
+                            dest='user_agent', action='store',
+                            help='user identify as AGENT(default: random)'
+                           )
+
         parser.add_argument('-v', '--version', dest='version', action='store_true',
                             help='output version information and exit')
 
@@ -225,6 +249,11 @@ class Helper(object):
                  )
             sys.exit()
 
+        if args.user_agent:
+            self.user_agent = args.user_agent
+        else:
+            self.user_agent = None
+
         if args.files and os.path.exists(args.files):
             self.data_file = args.files
         elif args.files is not None:
@@ -234,6 +263,8 @@ class Helper(object):
 
         if args.numbers:
             self.thread_num = args.numbers
+
+        return self.user_agent
 
     def working(self):
         ''' get content from queue. '''
