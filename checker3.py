@@ -19,15 +19,17 @@ import urllib.request, urllib.parse, urllib.error
 import re, csv, json
 import time, sys, os
 import argparse, random
+import gzip
 
 class Checker(object):
     ''' check update for software '''
 
     def __init__(self, *args):
         self.sub_pkg, self.url_type, self.name, self.url = args[:4]
-        self.branch, self.rpm_com, self.rpm_date = args[4:7]
+        self.branch,  self.rpm_com,  self.rpm_date       = args[4:7]
         self.release_date = self.release_com = ""
-        self.latest_date = self.latest_com = self.status = ""
+        self.latest_date  = self.latest_com  = ""
+        self.status = ""
 
     def get_page(self, _url):
         ''' 获取整个页面数据
@@ -45,18 +47,19 @@ class Checker(object):
             'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10) AppleWebKit/537.75.14 (KHTML, like Gecko) Version/7.0.3 Safari/7046A194A'
         ]
 
-        if Helper.helper(self):
-            header = { 'User-Agent': str(Helper.helper(self)) }
-        else:
-            header = { 'User-Agent': ualist[random.randint(0, len(ualist)-1)] }
-        req = urllib.request.Request(url = _url, headers = header)
+        header = { 'Accept-Encoding': 'gzip' }
+        header['User-Agent'] = ualist[random.randint(0, len(ualist)-1)]
+        if Helper.helper(self): header['User-Agent'] = str(Helper.helper(self))
 
-        if self.url_type == "2":
-            return "None Content"
-        elif self.url_type == "4":
-            return urllib.request.urlopen(req).read().decode('gb2312').encode('utf-8')
-        else:
-            return urllib.request.urlopen(req).read()
+        req  = urllib.request.Request(url = _url, headers = header)
+        page = urllib.request.urlopen(req).read()
+
+        try:
+            if self.url_type == "2": return "None Content"
+            if self.url_type == "4": return gzip.decompress(page).decode('gb2312').encode('utf-8')
+            else:                    return gzip.decompress(page)
+        except OSError:
+            return page
 
     def get_date(self, _page):
         ''' 获取 date -> 150708
@@ -159,7 +162,7 @@ class Helper(object):
 
     def __init__(self):
         self.thread_num = 10
-        self.data_file = 'checker_data.csv'
+        self.data_file  = 'checker_data.csv'
         self.user_agent = None
         self.q = Queue()
 
