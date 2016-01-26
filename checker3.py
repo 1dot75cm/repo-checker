@@ -19,7 +19,30 @@ import urllib.request, urllib.parse, urllib.error
 import re, csv, json
 import time, sys, os
 import argparse, random
-import gzip
+import gzip, ssl
+from io import BytesIO
+
+class GzipHandler(urllib.request.BaseHandler):
+    ''' A handler to add gzip capabilities to urllib requests '''
+
+    def http_request(self, req):
+        req.add_header('Accept-Encoding', 'gzip')
+        return req
+
+    def http_response(self, req, resp):
+        old_resp = resp    # resp.headers
+        data = resp.read()  # 内存中的数据，只能读一次
+        try:
+            content = gzip.GzipFile(fileobj = BytesIO(data), mode = 'r').read()
+        except OSError:
+            content = data
+        fp = BytesIO(content)  # File-like-obj具有read()方法
+        resp = urllib.request.addinfourl(fp, old_resp.headers, old_resp.url, old_resp.code)
+        resp.msg = old_resp.msg
+        return resp
+
+    https_request = http_request
+    https_response = http_response
 
 class Checker(object):
     ''' check update for software '''
@@ -49,10 +72,25 @@ class Checker(object):
 
         header = { 'Accept-Encoding': 'gzip' }
         header['User-Agent'] = ualist[random.randint(0, len(ualist)-1)]
-        if Helper.helper(self): header['User-Agent'] = str(Helper.helper(self))
+        if Helper.helper(self, 'ua'): header['User-Agent'] = str(Helper.helper(self, 'ua'))
 
         req  = urllib.request.Request(url = _url, headers = header)
-        page = urllib.request.urlopen(req).read()
+        pros = Helper.helper(self, 'proxy')
+        if pros and pros[0] in ('http', 'https'):
+            req.set_proxy(pros[1], pros[0])
+        # urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed
+        # https://www.python.org/dev/peps/pep-0476/
+        context = ssl._create_unverified_context()
+        page = urllib.request.urlopen(req, timeout=80, context=context).read()
+
+        #gzip_handler = GzipHandler()
+        #proxy_handler = urllib.request.ProxyHandler({'https':'XX.XX.XX.XX:XXXX'})
+        #proxy_auth_handler = urllib.request.ProxyBasicAuthHandler()
+        #proxy_auth_handler.add_password('realm', 'host', 'username', 'password')
+        #opener = urllib.request.build_opener(gzip_handler, proxy_handler, proxy_auth_handler)
+        #opener.addheaders = [('User-Agent', 'Python-urllib/2.7')]
+        #urllib.request.install_opener(opener)
+        #page = opener.open(_url).read()
 
         try:
             if self.url_type == "2": return "None Content"
@@ -164,7 +202,8 @@ class Helper(object):
         self.thread_num = 10
         self.data_file  = 'checker_data.csv'
         self.user_agent = None
-        self.q = Queue()
+        self.proxy      = None
+        self.q          = Queue()
 
     def load_data(self):
         ''' Load csv file.
@@ -212,10 +251,11 @@ class Helper(object):
             stop_sec = time.time()
             return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), stop_sec - start_sec
 
-    def helper(self):
+    def helper(self, arg=None):
         ''' display help information.
         return csv_path, thread_num'''
 
+        self.proxy = self.user_agent = None
         doclist = []
         for i in __doc__.splitlines():
             if i.startswith("@") and i.find(": ") > -1:
@@ -241,6 +281,11 @@ class Helper(object):
                             help='user identify as AGENT(default: random)'
                            )
 
+        parser.add_argument('-x', '--proxy', metavar='PROTOCOL://HOST:PORT', type=str,
+                            dest='proxy', action='store',
+                            help='use proxy on given port'
+                           )
+
         parser.add_argument('-v', '--version', dest='version', action='store_true',
                             help='output version information and exit')
 
@@ -252,10 +297,11 @@ class Helper(object):
                  )
             sys.exit()
 
+        if args.proxy:
+            self.proxy = re.split('://', args.proxy)
+
         if args.user_agent:
             self.user_agent = args.user_agent
-        else:
-            self.user_agent = None
 
         if args.files and os.path.exists(args.files):
             self.data_file = args.files
@@ -267,7 +313,10 @@ class Helper(object):
         if args.numbers:
             self.thread_num = args.numbers
 
-        return self.user_agent
+        if arg == 'ua':
+            return self.user_agent
+        elif arg == 'proxy':
+            return self.proxy
 
     def working(self):
         ''' get content from queue. '''
