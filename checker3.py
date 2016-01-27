@@ -6,9 +6,10 @@
 @project: Checker
 @github: http://github.com/1dot75cm/repo-checker
 @description: Checker is used to check update for software.
-@version: 0.3
+@version: 0.4
 @history:
-    0.3 - use class (2016.01.24)
+    0.4 - Add user-agent, gzip, http-proxy, aio support(2016.01.28)
+    0.3 - Use class (2016.01.24)
     0.2 - Add help info, use multithread (2016.01.10)
     0.1 - Initial version (2016.01.05)
 '''
@@ -21,6 +22,7 @@ import time, sys, os
 import argparse, random
 import gzip, ssl
 from io import BytesIO
+import asyncio, aiohttp
 
 class GzipHandler(urllib.request.BaseHandler):
     ''' A handler to add gzip capabilities to urllib requests '''
@@ -54,11 +56,7 @@ class Checker(object):
         self.latest_date  = self.latest_com  = ""
         self.status = ""
 
-    def get_page(self, _url):
-        ''' 获取整个页面数据
-        return str '''
-
-        ualist = [
+        self.ualist = [
             'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36',
             'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36',
             'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.1 Safari/537.36',
@@ -70,12 +68,16 @@ class Checker(object):
             'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10) AppleWebKit/537.75.14 (KHTML, like Gecko) Version/7.0.3 Safari/7046A194A'
         ]
 
+    def get_page(self, _url):
+        ''' 获取整个页面数据
+        return str '''
+
         header = { 'Accept-Encoding': 'gzip' }
-        header['User-Agent'] = ualist[random.randint(0, len(ualist)-1)]
-        if Helper.helper(self, 'ua'): header['User-Agent'] = str(Helper.helper(self, 'ua'))
+        header['User-Agent'] = self.ualist[random.randint(0, len(self.ualist)-1)]
+        if opts['user_agent']: header['User-Agent'] = opts['user_agent']
 
         req  = urllib.request.Request(url = _url, headers = header)
-        pros = Helper.helper(self, 'proxy')
+        pros = opts['proxy']
         if pros and pros[0] in ('http', 'https'):
             req.set_proxy(pros[1], pros[0])
         # urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed
@@ -168,14 +170,17 @@ class Checker(object):
         type_num = ["3", "4", "5", "6", "7", "9", "10", "11", "12", "14", "20", "21"]
 
         if self.url_type in type_num:
-            release_url, latest_url = self.url.replace('%2',','), self.url.replace('%2',',')
+            release_url = self.url.replace('%2',',')
+            p1 = self.get_page(release_url)
+            self.release_date, self.release_com = self.get_date(p1), self.get_commit(p1)
+            self.latest_date, self.latest_com = self.release_date, self.release_com
         else:
             release_url = self.url + "/releases"
             latest_url = self.url + "/commits/" + self.branch
 
-        p1, p2 = self.get_page(release_url), self.get_page(latest_url)
-        self.release_date, self.release_com = self.get_date(p1), self.get_commit(p1)
-        self.latest_date, self.latest_com = self.get_date(p2), self.get_commit(p2)
+            p1, p2 = self.get_page(release_url), self.get_page(latest_url)
+            self.release_date, self.release_com = self.get_date(p1), self.get_commit(p1)
+            self.latest_date, self.latest_com = self.get_date(p2), self.get_commit(p2)
 
         if self.rpm_date == self.latest_date or self.rpm_date >= self.release_date:
             self.status = "normal"
@@ -196,14 +201,69 @@ class Checker(object):
               str(lat_ver).ljust(16) + \
               str(self.status))
 
+class CheckerAIO(Checker):
+
+    def __init__(self, *args):
+        super().__init__(*args)
+
+    @asyncio.coroutine
+    def get_page(self, _url):
+        ''' 获取整个页面数据
+        return str '''
+
+        header = { 'Accept-Encoding': 'gzip' }
+        header['User-Agent'] = self.ualist[random.randint(0, len(self.ualist)-1)]
+        if opts['user_agent']: header['User-Agent'] = opts['user_agent']
+
+        with (yield from semaphore):
+            response = yield from aiohttp.request('GET', _url, headers = header)
+            page = yield from response.read()
+
+        try:
+            if self.url_type == "2": return "None Content"
+            if self.url_type == "4": return gzip.decompress(page).decode('gb2312').encode('utf-8')
+            else:                    return gzip.decompress(page)
+        except OSError:
+            return page
+
+    @asyncio.coroutine
+    def get_info(self):
+        ''' 获取页面commit和date
+        return datalist'''
+
+        type_num = ["3", "4", "5", "6", "7", "9", "10", "11", "12", "14", "20", "21"]
+
+        if self.url_type in type_num:
+            release_url = self.url.replace('%2',',')
+            p1 = yield from self.get_page(release_url)
+            self.release_date, self.release_com = self.get_date(p1), self.get_commit(p1)
+            self.latest_date, self.latest_com = self.release_date, self.release_com
+        else:
+            release_url = self.url + "/releases"
+            latest_url = self.url + "/commits/" + self.branch
+
+            p1 = yield from self.get_page(release_url)
+            p2 = yield from self.get_page(latest_url)
+            self.release_date, self.release_com = self.get_date(p1), self.get_commit(p1)
+            self.latest_date, self.latest_com = self.get_date(p2), self.get_commit(p2)
+
+        if self.rpm_date == self.latest_date or self.rpm_date >= self.release_date:
+            self.status = "normal"
+        else:
+            self.status = "update" + "[" + self.url + "]"
+
 class Helper(object):
 
     def __init__(self):
-        self.thread_num = 10
-        self.data_file  = 'checker_data.csv'
-        self.user_agent = None
-        self.proxy      = None
-        self.q          = Queue()
+        global opts
+        opts = {
+            'thread_num': 10,
+            'data_file' : 'checker_data.csv',
+            'user_agent': None,
+            'proxy'     : None,
+            'mode'      : 'thread'
+        }
+        self.q = Queue()
 
     def load_data(self):
         ''' Load csv file.
@@ -220,7 +280,7 @@ class Helper(object):
         return list '''
 
         csvlist = []
-        with open(self.data_file, 'r') as csvfile:
+        with open(opts['data_file'], 'r') as csvfile:
             content = csv.reader(csvfile, delimiter=',', quotechar='|')
             for row in content:
                 if len(row) != 0 and row[0][0] != "#":
@@ -251,11 +311,10 @@ class Helper(object):
             stop_sec = time.time()
             return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), stop_sec - start_sec
 
-    def helper(self, arg=None):
+    def helper(self):
         ''' display help information.
         return csv_path, thread_num'''
 
-        self.proxy = self.user_agent = None
         doclist = []
         for i in __doc__.splitlines():
             if i.startswith("@") and i.find(": ") > -1:
@@ -286,6 +345,11 @@ class Helper(object):
                             help='use proxy on given port'
                            )
 
+        parser.add_argument('-m', '--mode', dest='mode', action='store',
+                            choices={'thread','aio'}, default='thread',
+                            help='multi-tasking mode(default: thread)'
+                           )
+
         parser.add_argument('-v', '--version', dest='version', action='store_true',
                             help='output version information and exit')
 
@@ -297,26 +361,24 @@ class Helper(object):
                  )
             sys.exit()
 
+        if args.mode:
+            opts['mode'] = args.mode
+
         if args.proxy:
-            self.proxy = re.split('://', args.proxy)
+            opts['proxy'] = re.split('://', args.proxy)
 
         if args.user_agent:
-            self.user_agent = args.user_agent
+            opts['user_agent'] = args.user_agent
 
         if args.files and os.path.exists(args.files):
-            self.data_file = args.files
+            opts['data_file'] = args.files
         elif args.files is not None:
             print("{}: cannot access '{}': No such file or directory"
                 .format(_project, args.files))
             sys.exit()
 
         if args.numbers:
-            self.thread_num = args.numbers
-
-        if arg == 'ua':
-            return self.user_agent
-        elif arg == 'proxy':
-            return self.proxy
+            opts['thread_num'] = args.numbers
 
     def working(self):
         ''' get content from queue. '''
@@ -330,15 +392,18 @@ class Helper(object):
         ''' Mutilthreads test: 1, 569s; 5, 107s; 10, 54s; 15, 37s
         create threads, and put data to queue. '''
 
-        for i in range(self.thread_num):
+        for i in range(opts['thread_num']):
             t = Thread(target=self.working, args=())
             t.setDaemon(True)
             t.start()
 
         for item in args:
             self.q.put(item)
-
         self.q.join()
+
+    @asyncio.coroutine
+    def running_aio(self, args):
+        yield from args.get_info()
 
 if __name__ == "__main__":
     tools = Helper()
@@ -347,13 +412,20 @@ if __name__ == "__main__":
 
     objlist = []
     for i in tools.load_data():
-        i[2] = Checker(*i)
+        if opts['mode'] == 'aio':
+            i[2] = CheckerAIO(*i)
+        else:
+            i[2] = Checker(*i)
         objlist.append(i[2])
 
-    try:
+    if opts['mode'] == 'thread':
         tools.running(*objlist)
-    except KeyboardInterrupt:
-        pass
+    else:
+        global semaphore
+        semaphore = asyncio.Semaphore(opts['thread_num'])
+        loop = asyncio.get_event_loop()
+        tasks = asyncio.wait([tools.running_aio(i) for i in objlist])
+        loop.run_until_complete(tasks)
 
     for obj in objlist:
         obj.output()
