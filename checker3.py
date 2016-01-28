@@ -23,6 +23,7 @@ import argparse, random
 import gzip, ssl
 from io import BytesIO
 import asyncio, aiohttp
+import tqdm, signal
 
 class GzipHandler(urllib.request.BaseHandler):
     ''' A handler to add gzip capabilities to urllib requests '''
@@ -203,9 +204,6 @@ class Checker(object):
 
 class CheckerAIO(Checker):
 
-    def __init__(self, *args):
-        super().__init__(*args)
-
     @asyncio.coroutine
     def get_page(self, _url):
         ''' 获取整个页面数据
@@ -264,8 +262,9 @@ class Helper(object):
             'mode'      : 'thread'
         }
         self.q = Queue()
+        self.localtime(1)
 
-    def load_data(self):
+    def inputs(self):
         ''' Load csv file.
 
         CSV Format:
@@ -291,7 +290,7 @@ class Helper(object):
         ''' Output. '''
 
         if title == 1:
-            print("# Generation date:", self.localtime(1), \
+            print("# Generation date:", self.localtime(0)[0], \
                   "\n Name".ljust(23) + \
                   "RPM-Version".ljust(16) + \
                   "Rel-Version".ljust(16) + \
@@ -304,12 +303,12 @@ class Helper(object):
         ''' return current localtime and seconds. '''
 
         global start_sec, stop_sec
+        local_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         if trigger == 1:
             start_sec = time.time()
-            return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         elif trigger == 0:
             stop_sec = time.time()
-            return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), stop_sec - start_sec
+            return (local_time, stop_sec - start_sec)
 
     def helper(self):
         ''' display help information.
@@ -326,29 +325,24 @@ class Helper(object):
         parser.add_argument('-n', '--number', metavar='NUM', type=int,
                             dest='numbers', action='store',
                             help='{_name} work number of thread(default: 10)'.format(
-                                _name=_project.lower())
-                           )
+                                _name=_project.lower()))
 
         parser.add_argument('-f', '--file', metavar='PATH',
                             dest='files', action='store',
                             help='{_name} data(csv) full path'.format(
-                                _name=_project.lower())
-                           )
+                                _name=_project.lower()))
 
         parser.add_argument('-U', '--user-agent', metavar='AGENT', type=str,
                             dest='user_agent', action='store',
-                            help='user identify as AGENT(default: random)'
-                           )
+                            help='user identify as AGENT(default: random)')
 
         parser.add_argument('-x', '--proxy', metavar='PROTOCOL://HOST:PORT', type=str,
                             dest='proxy', action='store',
-                            help='use proxy on given port'
-                           )
+                            help='use proxy on given port')
 
         parser.add_argument('-m', '--mode', dest='mode', action='store',
                             choices={'thread','aio'}, default='thread',
-                            help='multi-tasking mode(default: thread)'
-                           )
+                            help='multi-tasking mode(default: thread)')
 
         parser.add_argument('-v', '--version', dest='version', action='store_true',
                             help='output version information and exit')
@@ -357,8 +351,7 @@ class Helper(object):
 
         if args.version:
             print('{} version {}\nWritten by {} <{}>\nReport bug: <{}>'.format(
-                     _project, _version, _author, _email, _github)
-                 )
+                  _project, _version, _author, _email, _github))
             sys.exit()
 
         if args.mode:
@@ -402,32 +395,39 @@ class Helper(object):
         self.q.join()
 
     @asyncio.coroutine
-    def running_aio(self, args):
-        yield from args.get_info()
+    def progress(self, coros):
+        for obj in tqdm.tqdm(asyncio.as_completed(coros), total=len(coros)):
+            yield from obj
+
+    def interrupt(self):
+        for task in asyncio.Task.all_tasks():
+            task.cancel()
 
 if __name__ == "__main__":
     tools = Helper()
     tools.helper()
-    tools.output(1)
 
     objlist = []
-    for i in tools.load_data():
+    for i in tools.inputs():
         if opts['mode'] == 'aio':
-            i[2] = CheckerAIO(*i)
+            objlist.append(CheckerAIO(*i))
         else:
-            i[2] = Checker(*i)
-        objlist.append(i[2])
+            objlist.append(Checker(*i))
 
-    if opts['mode'] == 'thread':
-        tools.running(*objlist)
-    else:
-        global semaphore
-        semaphore = asyncio.Semaphore(opts['thread_num'])
-        loop = asyncio.get_event_loop()
-        tasks = asyncio.wait([tools.running_aio(i) for i in objlist])
-        loop.run_until_complete(tasks)
+    try:
+        if opts['mode'] == 'thread':
+            tools.running(*objlist)
+        else:
+            global semaphore
+            semaphore = asyncio.Semaphore(opts['thread_num'])
+            loop = asyncio.get_event_loop()
+            loop.add_signal_handler(signal.SIGINT, tools.interrupt) # 捕捉信号
+            tasks = [i.get_info() for i in objlist]
+            loop.run_until_complete(tools.progress(tasks))
+    except (KeyboardInterrupt, asyncio.CancelledError, urllib.error.URLError):
+        pass
 
+    tools.output(1)
     for obj in objlist:
         obj.output()
-
     tools.output()
