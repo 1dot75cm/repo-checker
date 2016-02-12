@@ -36,12 +36,12 @@
 #1,1,gflags,https://github.com/schuhschuh/gflags,feature/%2383-alternative-namespace,1234567,140717,el7
 
 0,1,grub4dos,https://github.com/chenall/grub4dos,0.4.6a,8a69be9,160114,grub4dos-0.4.6a.20160114-1.git8a69be9.fc23.src.rpm
-0,1,bcloud,https://github.com/LiuLang/bcloud,master,4b54e0f,160102,bcloud-3.8.2-1.git4b54e0f.fc23.src.rpm
+0,1,bcloud,https://github.com/LiuLang/bcloud,master,4b54e0f,160102,bcloud-3.8.2-2.git4b54e0f.fc23.src.rpm
 0,1,screenfetch,https://github.com/KittyKatt/screenFetch,master,22e5bee,151204,screenfetch-3.7.0-3.git22e5bee.fc23.src.rpm
 0,1,xware-desktop,https://github.com/Xinkai/XwareDesktop,master,b77d20b,151221,xware-desktop-0.13-3.gitb77d20b.fc23.src.rpm
 
 0,1,kwplayer,https://github.com/LiuLang/kwplayer,master,d623733,150920,kwplayer-3.5.2-3.gitd623733.fc23.src.rpm
-1,3,python-mutagen,https://bitbucket.org/lazka/mutagen/downloads,None,d630a68,150910,python-mutagen-1.31-1.fc22.src.rpm
+1,3,python-mutagen,https://bitbucket.org/lazka/mutagen/downloads,None,d630a68,150910,python-mutagen-1.31-2.fc23.src.rpm
 1,1,python3-xlib,https://github.com/LiuLang/python3-xlib,master,e68a323,141113,python3-xlib-0.15-1.gite68a323.fc22.src.rpm
 1,1,python3-keybinder,https://github.com/LiuLang/python3-keybinder,master,1f633d0,141120,python3-keybinder-1.1.2-1.git1f633d0.fc22.src.rpm
 1,1,python-html2text,https://github.com/Alir3z4/html2text,master,0c70c8f,160108,python-html2text-2016.1.8-1.git0c70c8f.fc23.src.rpm
@@ -49,11 +49,11 @@
 0,1,pointdownload,https://github.com/PointTeam/PointDownload,develop,cd07f1d,150507,pointdownload-1.2.0-2.gitcd07f1d.fc22.src.rpm
 0,1,simplescreenrecorder,https://github.com/MaartenBaert/ssr,master,c580a19,151205,simplescreenrecorder-0.3.6-1.gitc580a19.fc23.src.rpm
 0,6,youdao-dict,http://cidian.youdao.com/index-linux.html,None,None,151230,youdao-dict-1.1.0-1.fc23.src.rpm
-0,1,obs-studio,https://github.com/jp9000/obs-studio,master,514b59c,160128,obs-studio-0.13.0-1.git514b59c.fc23.src.rpm
+0,1,obs-studio,https://github.com/jp9000/obs-studio,master,a6c8a92,160205,obs-studio-0.13.1-1.gita6c8a92.fc23.src.rpm
 
-0,7,opera-stable,http://ftp.opera.com/pub/opera/desktop,None,None,160119,opera-stable-34.0.2036.50-1.net.src.rpm
-0,7,opera-beta,http://ftp.opera.com/pub/opera-beta,None,None,160126,opera-beta-35.0.2066.35-1.net.src.rpm
-0,7,opera-developer,http://ftp.opera.com/pub/opera-developer,None,None,160127,opera-developer-36.0.2120.0-1.net.src.rpm
+0,7,opera-stable,http://ftp.opera.com/pub/opera/desktop,None,None,160201,opera-stable-35.0.2066.37-1.net.src.rpm
+0,7,opera-beta,http://ftp.opera.com/pub/opera-beta,None,None,160209,opera-beta-36.0.2130.2-1.net.src.rpm
+0,7,opera-developer,http://ftp.opera.com/pub/opera-developer,None,None,160204,opera-developer-36.0.2129.0-1.net.src.rpm
 0,1,freshplayerplugin,https://github.com/i-rinat/freshplayerplugin,master,2b06d00,151220,freshplayerplugin-0.3.4-1.git2b06d00.fc23.src.rpm
 
 0,1,shadowsocks,https://github.com/mengskysama/shadowsocks-rm,feature-ota,767b921,151216,python-shadowsocks-2.8.3-1.git767b921.fc23.src.rpm
@@ -63,7 +63,7 @@
 0,5,tragtor,http://repository.mein-neues-blog.de:9000,None,None,150721,tragtor-0.9.2-1.fc23.src.rpm
 0,1,doubanfm-qt,https://github.com/zonyitoo/doubanfm-qt,master,826e8a2,151205,doubanfm-qt-2.2-2.git826e8a2.fc23.src.rpm
 0,1,moonplayer,https://github.com/coslyk/moonplayer,master,dbba642,160127,moonplayer-0.55-1.gitdbba642.fc23.src.rpm
-0,1,musicbox,https://github.com/darknessomi/musicbox,master,0d67739,151231,musicbox-0.2.0.8-1.git0d67739.fc23.src.rpm
+0,1,musicbox,https://github.com/darknessomi/musicbox,master,f0d05ae,160210,musicbox-0.2.1.0-1.gitf0d05ae.fc23.src.rpm
 
 0,1,deepin-music-player,https://github.com/linuxdeepin/deepin-music,master,c43b01d,150617,deepin-music-player-2.3.0-1.gitc43b01d.fc22.src.rpm
 1,1,deepin-ui,https://github.com/linuxdeepin/deepin-ui,master,8d75806,150701,deepin-ui-1.0.4-1.git8d75806.fc22.src.rpm
@@ -89,7 +89,7 @@
 1,1,dbus-generator,https://github.com/linuxdeepin/go-dbus-generator,master,84ee26c,141120,dbus-generator-0.0.3-1.git84ee26c.fc22.src.rpm
 1,1,golang-dlib,https://github.com/linuxdeepin/go-lib,master,98ac007,150703,golang-dlib-0.3.0-1.git98ac007.fc22.src.rpm
 #1,1,python-xpybutil,https://github.com/BurntSushi/xpybutil,master,8ee7dc4,150318
-1,1,qtav,https://github.com/wang-bin/QtAV,master,519af91,151223,qtav-1.9.0-1.git519af91.fc23.src.rpm
+1,1,qtav,https://github.com/wang-bin/QtAV,master,ed374dc,160209,qtav-1.9.0-3.gited374dc.fc23.src.rpm
 
 0,1,baka-mplayer,https://github.com/u8sand/Baka-MPlayer,master,e1df4b4,151202,baka-mplayer-2.0.4-1.gite1df4b4.fc23.src.rpm
 
@@ -97,17 +97,17 @@
 1,1,libqtelegram-ae,https://github.com/Aseman-Land/libqtelegram-aseman-edition,master,4ad3aae,160112,libqtelegram-ae-6.1-1.git4ad3aae.fc23.src.rpm
 1,1,libtelegramqml,https://github.com/Aseman-Land/TelegramQML,master,f7e7ef4,160116,libtelegramqml-0.9.2-1.gitf7e7ef4.fc23.src.rpm
 
-0,8,pacman,https://projects.archlinux.org/pacman.git/refs,None,5780350,150220,pacman-4.2.1-3.git5780350.fc22.src.rpm
-1,1,package-query,https://github.com/archlinuxfr/package-query,master,9305778,150908,package-query-1.6.2-3.git9305778.fc22.src.rpm
-1,1,yaourt,https://github.com/archlinuxfr/yaourt,master,e75e9b8,150909,yaourt-1.6-5.gite75e9b8.fc22.src.rpm
+0,8,pacman,https://projects.archlinux.org/pacman.git/refs,None,fea9abc,160130,pacman-5.0.0-1.gitfea9abc.fc23.src.rpm
+1,1,package-query,https://github.com/archlinuxfr/package-query,master,a2e8235,160212,package-query-1.7-1.gita2e8235.fc23.src.rpm
+1,1,yaourt,https://github.com/archlinuxfr/yaourt,master,56818c0,160208,yaourt-1.7-1.git56818c0.fc23.src.rpm
 
-0,9,apt,https://anonscm.debian.org/cgit/apt/apt.git/refs,None,88f89c5,151005,apt-1.0.10.2-1.fc22.src.rpm,http://ftp.debian.org/debian/pool/main/a/apt
+0,9,apt,https://anonscm.debian.org/cgit/apt/apt.git/refs,None,29f80b3,160210,apt-1.2.3-1.fc23.src.rpm,http://ftp.debian.org/debian/pool/main/a/apt
 
 #!0,1,ue4,https://github.com/EpicGames/UnrealEngine,master,311e18f,141231,ue4-4.9.0-2.git311e18f.fc22.src.rpm
 #!0,10,unity-editor,http://unity3d.com,None,None,141231,unity-editor-5.1.0f3-1.fc22.src.rpm
 
-0,10,nginx,http://nginx.org/en/CHANGES,None,None,160126,nginx-1.9.10-1.modsec_2.9.0.fc23.src.rpm
-1,1,ngx-lua,https://github.com/openresty/lua-nginx-module,master,09644c4,160111
+0,10,nginx,http://nginx.org/en/CHANGES,None,None,160209,nginx-1.9.11-1.modsec_2.9.0.fc23.src.rpm
+1,1,ngx-lua,https://github.com/openresty/lua-nginx-module,master,64866bc,160211
 1,1,ngx-devel,https://github.com/simpl/ngx_devel_kit,master,8dd0df5,130926
 1,1,CoreRuleSet,https://github.com/SpiderLabs/owasp-modsecurity-crs,master,60c8bc9,151030
 1,1,ngx-fancy,https://github.com/aperezdc/ngx-fancyindex,master,c97e11a,160126
@@ -123,14 +123,14 @@
 
 0,12,sandbox,https://gitweb.gentoo.org/proj/sandbox.git/log,master,767beca,151219,sandbox-2.10-1.fc23.src.rpm
 
-0,1,atom,https://github.com/atom/atom,master,2cf2ccb,160125,atom-1.4.1-2.git2cf2ccb.fc23.src.rpm
+0,1,atom,https://github.com/atom/atom,master,88524b1,160211,atom-1.5.1-1.git88524b1.fc23.src.rpm
 0,1,brackets,https://github.com/adobe/brackets,master,3df0ac6,160112,brackets-1.6-1.fc23.src.rpm
 1,1,brackets-shell,https://github.com/adobe/brackets-shell,master,1363c89,151212
-0,1,vscode,https://github.com/Microsoft/vscode,master,a80232b,151219,vscode-0.10.6-1.fc23.src.rpm
+0,1,vscode,https://github.com/Microsoft/vscode,master,149e7a0,160209,vscode-0.10.8-1.fc23.src.rpm
 
-#!0,13,oracle-jdk8,http://www.oracle.com/technetwork/java/javase,None,None,151222,oracle-jdk8-1.8.0.66-2.net.src.rpm
+#!0,13,oracle-jdk8,http://www.oracle.com/technetwork/java/javase,None,None,151222,oracle-jdk8-1.8.0.72-1.net.src.rpm
 #!0,13,oracle-jdk7,http://www.oracle.com/technetwork/java/javase/archive-139210.html,None,None,151222,oracle-jdk7-1.7.0.80-1.net.src.rpm
-0,14,wps-office,http://wps-community.org/downloads,None,None,160113,wps-office-10.1.0.5460-1.a20p1.net.src.rpm
+0,14,wps-office,http://wps-community.org/downloads,None,None,160203,wps-office-10.1.0.5503-1.a20p2.net.src.rpm
 #!0,15,wine-qqintl,http://packages.deepin.com/deepin/pool/non-free/d/deepinwine-qqintl,None,None,141231,wine-qqintl-0.1.3-2.net.src.rpm
 
 #!0,16,FoxitReader,http://cdn02.foxitsoftware.com/pub/foxit/reader/desktop/linux/1.x/1.1/enu,None,None,141231,FoxitReader-1.1.0-1.fc23.src.rpm,https://github.com/archlinuxcn/repo/commit/ceff4a52428e36beb0ed5d13307df21bfcb554b2
@@ -141,6 +141,9 @@
 
 0,1,xx-net,https://github.com/XX-net/XX-Net,master,84585b1,160113,xx-net-2.8.10-1.git84585b1.fc23.src.rpm
 0,1,gmediarender,https://github.com/hzeller/gmrender-resurrect,master,4003616,151105,gmediarender-0.0.7-1.git4003616.fc23.src.rpm
+0,1,lantern,https://github.com/getlantern/lantern,valencia,fdff338,160129,golang-github-getlantern-lantern-2.0.11-2.gitfdff338.fc23.src.rpm
+
+0,1,FeelUOwn,https://github.com/cosven/FeelUOwn,master,4fae2af,160205,feeluown-7.0-0.1.git4fae2af.fc23.src.rpm
 
 # Wait
 #0,1,deepin-translator,https://github.com/linuxdeepin/deepin-translator,master,1234567,141231
