@@ -9,6 +9,7 @@
 import sys
 import time
 import json
+import gzip
 import urllib.request
 import urllib.parse
 
@@ -39,8 +40,10 @@ class BaiduMap:
     def _fetch(self, query=None, json=True):
         data = urllib.parse.urlencode(query)
         url = self.mapurl + '?' + data
-        opener = urllib.request.FancyURLopener()
-        data = opener.open(url).read()
+        header = {'Accept-Encoding': 'gzip'}
+        req = urllib.request.Request(url=url, headers=header)
+        resp = urllib.request.urlopen(req).read()
+        data = gzip.decompress(resp)
 
         if json:
             return self._tojson(data.decode())
