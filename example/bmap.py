@@ -12,6 +12,7 @@ import json
 import gzip
 import urllib.request
 import urllib.parse
+import asyncio, aiohttp
 
 class BaiduMap:
     """ get baidu map infomation.
@@ -37,7 +38,20 @@ class BaiduMap:
         self.total_num = 0
         self._get_city()
 
-    def _fetch(self, query=None, json=True):
+    async def _fetch(self, query=None, json=True):
+        data = urllib.parse.urlencode(query)
+        url = self.mapurl + '?' + data
+        header = {'Accept-Encoding': 'gzip'}
+        with (await semaphore):
+            resp = await aiohttp.request('GET', url=url, headers=header)
+            data = await resp.read()
+
+        if json:
+            return self._tojson(data.decode())
+        else:
+            return data.decode()
+
+    def _get(self, query=None, json=True):
         data = urllib.parse.urlencode(query)
         url = self.mapurl + '?' + data
         header = {'Accept-Encoding': 'gzip'}
@@ -59,7 +73,7 @@ class BaiduMap:
         return js
 
     def _get_city(self):
-        data = self._fetch(self.query)
+        data = self._get(self.query)
 
         if type(data['content']) is not list:
             print('keyworld error.')
@@ -74,7 +88,7 @@ class BaiduMap:
         for city in self.city:
             self.total_num += city['num']
 
-    def _get_data(self, city, page=0):
+    async def _get_data(self, city, page=0):
         query = [
                 ('newmap', '1'),
                 ('from', 'webmap'),
@@ -89,7 +103,7 @@ class BaiduMap:
                 ('t', time.time().__int__()),
                  ]
 
-        data = self._fetch(query)
+        data = await self._fetch(query)
         return data
 
     def _save(self, content, city):
@@ -105,31 +119,30 @@ class BaiduMap:
             self.file.write(_data)
             print('({}/{}) {}[{}/{}]'.format(self.count, self.total_num, city['name'], self.count_c, city['num']))
 
-    def get(self, city):
+    async def get(self, city):
         self.count_c = 0
         pages = abs(-city['num'] // 10)
         for page in range(0, pages):
-            data = self._get_data(city, page)
+            data = await self._get_data(city, page)
             if 'content' in data:
                 self._save(data['content'], city)
-
-    def get_all(self):
-        for city in self.city:
-            self.get(city)
-
-        self.file.close()
 
 
 if __name__ == '__main__':
     if sys.argv.__len__() > 1:
         keyword = sys.argv[1]
     else:
-        keyword = '酒店'
+        keyword = '如家'
 
     baidumap = BaiduMap(keyword)
     print('_' * 20)
     print('City: {}'.format(baidumap.city.__len__()))
     print('Data: {}'.format(baidumap.total_num))
     print('(当前/总数) 城市 [当前/总数(城市)]')
-    baidumap.get_all()
 
+    global semaphore
+    semaphore = asyncio.Semaphore(100)
+    loop = asyncio.get_event_loop()
+    tasks = asyncio.wait([baidumap.get(i) for i in baidumap.city])
+    loop.run_until_complete(tasks)
+    baidumap.file.close()
