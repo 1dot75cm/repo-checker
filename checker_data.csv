@@ -36,7 +36,7 @@
 #1,1,gflags,https://github.com/schuhschuh/gflags,feature/%2383-alternative-namespace,1234567,140717,el7
 
 0,1,grub4dos,https://github.com/chenall/grub4dos,0.4.6a,8a69be9,160114,grub4dos-0.4.6a.20160114-1.git8a69be9.fc23.src.rpm
-0,1,bcloud,https://github.com/LiuLang/bcloud,master,4b54e0f,160102,bcloud-3.8.2-2.git4b54e0f.fc23.src.rpm
+0,1,bcloud,https://github.com/LiuLang/bcloud,master,4b54e0f,160102,bcloud-3.8.2-3.git4b54e0f.fc23.src.rpm
 0,1,screenfetch,https://github.com/KittyKatt/screenFetch,master,22e5bee,151204,screenfetch-3.7.0-3.git22e5bee.fc23.src.rpm
 0,1,xware-desktop,https://github.com/Xinkai/XwareDesktop,master,b77d20b,151221,xware-desktop-0.13-3.gitb77d20b.fc23.src.rpm
 
@@ -89,7 +89,7 @@
 1,1,dbus-generator,https://github.com/linuxdeepin/go-dbus-generator,master,84ee26c,141120,dbus-generator-0.0.3-1.git84ee26c.fc22.src.rpm
 1,1,golang-dlib,https://github.com/linuxdeepin/go-lib,master,98ac007,150703,golang-dlib-0.3.0-1.git98ac007.fc22.src.rpm
 #1,1,python-xpybutil,https://github.com/BurntSushi/xpybutil,master,8ee7dc4,150318
-1,1,qtav,https://github.com/wang-bin/QtAV,master,ed374dc,160209,qtav-1.9.0-3.gited374dc.fc23.src.rpm
+1,1,qtav,https://github.com/wang-bin/QtAV,master,1f53443,160228,qtav-1.10.0-1.git1f53443.fc23.src.rpm
 
 0,1,baka-mplayer,https://github.com/u8sand/Baka-MPlayer,master,e1df4b4,151202,baka-mplayer-2.0.4-1.gite1df4b4.fc23.src.rpm
 
@@ -123,12 +123,12 @@
 
 0,12,sandbox,https://gitweb.gentoo.org/proj/sandbox.git/log,master,767beca,151219,sandbox-2.10-1.fc23.src.rpm
 
-0,1,atom,https://github.com/atom/atom,master,3e71894,160213,atom-1.5.3-1.git3e71894.fc23.src.rpm
-1,1,apm,https://github.com/atom/apm,master,829b81a,160211,nodejs-atom-package-manager-1.7.0-1.git829b81a.fc23.src.rpm
-1,1,electron,https://github.com/atom/electron,master,4b18317,160219,electron-0.36.8-1.prebuilt.fc23.src.rpm
+0,1,atom,https://github.com/atom/atom,master,01c7777,160318,atom-1.6.0-2.git01c7777.fc23.src.rpm
+1,1,apm,https://github.com/atom/apm,master,955326e,160303,nodejs-atom-package-manager-1.7.1-3.git955326e.fc23.src.rpm
+1,1,electron,https://github.com/atom/electron,master,ead94b7,160312,electron-0.36.11-1.prebuilt.fc23.src.rpm
 0,1,brackets,https://github.com/adobe/brackets,master,3df0ac6,160112,brackets-1.6-1.fc23.src.rpm
 1,1,brackets-shell,https://github.com/adobe/brackets-shell,master,1363c89,151212
-0,1,vscode,https://github.com/Microsoft/vscode,master,149e7a0,160209,vscode-0.10.8-1.fc23.src.rpm
+0,1,vscode,https://github.com/Microsoft/vscode,master,5b5f4db,160307,vscode-0.10.10-3.fc23.src.rpm
 
 #!0,13,oracle-jdk8,http://www.oracle.com/technetwork/java/javase,None,None,151222,oracle-jdk8-1.8.0.72-1.net.src.rpm
 #!0,13,oracle-jdk7,http://www.oracle.com/technetwork/java/javase/archive-139210.html,None,None,151222,oracle-jdk7-1.7.0.80-1.net.src.rpm
@@ -147,6 +147,9 @@
 
 0,1,FeelUOwn,https://github.com/cosven/FeelUOwn,master,166205e,160224,feeluown-7.1-0.1.git166205e.fc23.src.rpm
 0,1,osdlyrics,https://github.com/PedroHLC/osdlyrics,legacy-dev,33f67b4,151214,osdlyrics-0.4.3-1.git33f67b4.fc23.src.rpm
+0,1,wechat,https://github.com/geeeeeeeeek/electronic-wechat,master,6704050,160317,wechat-1.1.1-1.git6704050.fc23.src.rpm
+0,1,n1,https://github.com/nylas/N1,master,8cb7748,160318,n1-0.4.16-1.git8cb7748.fc23.src.rpm
+0,1,rocketchat,https://github.com/RocketChat/Rocket.Chat.Electron,master,abb7b81,160308,rocketchat-1.2.0-1.gitabb7b81.fc23.src.rpm
 
 # Wait
 #0,1,deepin-translator,https://github.com/linuxdeepin/deepin-translator,master,1234567,141231
