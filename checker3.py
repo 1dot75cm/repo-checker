@@ -140,6 +140,10 @@ class Checker(object):
         elif self.url_type == "21":
             _page = json.loads(_page.decode())['PCC'][0]['date'].encode()
             pattern = b'(.*)'
+        elif self.url_type == "22":
+            _page = re.findall(b'.*364.*', _page)[-1]
+            pattern = b'([0-9]{2}-\w{3}-[0-9]{4})'
+            time_format = "%d-%b-%Y"
 
         try:
             d = re.search(pattern, _page, re.M).group(1).decode()
@@ -168,7 +172,7 @@ class Checker(object):
         ''' 获取页面commit和date
         return datalist'''
 
-        type_num = ["3", "4", "5", "6", "7", "9", "10", "11", "12", "14", "20", "21"]
+        type_num = ["3", "4", "5", "6", "7", "9", "10", "11", "12", "14", "20", "21", "22"]
 
         if self.url_type in type_num:
             release_url = self.url.replace('%2',',')
@@ -229,7 +233,7 @@ class CheckerAIO(Checker):
         ''' 获取页面commit和date
         return datalist'''
 
-        type_num = ["3", "4", "5", "6", "7", "9", "10", "11", "12", "14", "20", "21"]
+        type_num = ["3", "4", "5", "6", "7", "9", "10", "11", "12", "14", "20", "21", "22"]
 
         if self.url_type in type_num:
             release_url = self.url.replace('%2',',')

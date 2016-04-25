@@ -2,7 +2,7 @@
 #   Sub Package: 0. normal 1. subpkg
 #   Url Type: 1. github 2. google 3. bitbucket 4. sogou 5. tragtor 6. youdao
 #     7. opera 8. pacman 9. apt 10. nginx 11. ccal 12. sandbox 14. wps
-#     20. qt-installer-freamwork 21. pycharm
+#     20. qt-installer-freamwork 21. pycharm 22. nvidia
 #   Name, Url, Branch, RPM Commit, RPM Update Time, Others
 
 0,1,wiznote,https://github.com/WizTeam/WizQTClient,master,fdd16c9,151126,wiznote-2.3.1-1.gitfdd16c9.fc23.src.rpm
@@ -154,6 +154,8 @@
 0,1,lighttable,https://github.com/LightTable/LightTable,master,53a90be,160122,lighttable-0.8.1-2.fc23.src.rpm
 1,1,leiningen,https://github.com/technomancy/leiningen,master,f9a464e,160209,leiningen-2.6.1-1.fc23.src.rpm
 
+0,22,nvidia-kmod,http://download.nvidia.com/XFree86/Linux-x86_64,None,None,160406
+
 # Wait
 #0,1,deepin-translator,https://github.com/linuxdeepin/deepin-translator,master,1234567,141231
 #1,1,python-pyocr,https://github.com/jflesch/pyocr,master,1234567,150113
@@ -179,7 +181,6 @@
 #0,1,goagent,https://github.com/goagent/goagent,master,1234567,20150101
 #0,1,monkey-videos,https://github.com/LiuLang/monkey-videos,master,1234567,20141205
 #0,1,vmware,https://my.vmware.com/web/vmware/info/slug/desktop_end_user_computing/vmware_workstation/11_0,https://my.vmware.com,None,None,20150217
-#0,1,nvidia-340xx-kmod,ftp://download.nvidia.com/XFree86/Linux-x86_64,None,None,20141208
 #0,1,chameleon,http://forge.voodooprojects.org/p/chameleon/timeline/commits,None,None,20150126
 #0,1,fakesmc,http://hwsensors.com/releases,None,None,20150101,Binaries.dmg,6.14.1364
 
