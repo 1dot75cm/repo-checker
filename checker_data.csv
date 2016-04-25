@@ -23,14 +23,14 @@
 #1,1,kcm-fcitx,https://github.com/fcitx/kcm-fcitx,master,1234567,141209
 #1,1,fcitx-ui-light,https://github.com/fcitx/fcitx-ui-light,master,1234567,120305,el7
 #1,1,fcitx-fbterm,https://github.com/fcitx/fcitx-fbterm,master,1234567,121218,el7
-#1,1,fcitx-cloudpinyin,https://github.com/fcitx/fcitx-cloudpinyin,master,1234567,140606,el7
-#1,1,fcitx-googlepinyin,https://github.com/fcitx/fcitx-googlepinyin,master,1234567,140204
-#1,2,libgooglepinyin,https://libgooglepinyin.googlecode.com,None,None,140204
+1,1,fcitx-cloudpinyin,https://github.com/fcitx/fcitx-cloudpinyin,master,45277f6,151212,el7,fcitx-cloudpinyin-0.3.4-3.git45277f6.fc23.src.rpm
+1,1,fcitx-googlepinyin,https://github.com/fcitx/fcitx-googlepinyin,master,6536e18,151212,fcitx-googlepinyin-0.1.6-2.git6536e18.fc23.src.rpm
+1,2,libgooglepinyin,https://libgooglepinyin.googlecode.com,None,None,140204,libgooglepinyin-0.1.2-3.fc23.src.rpm
 
 #0,1,ibus-rime,https://github.com/rime/ibus-rime,master,1234567,141214
-0,1,fcitx-rime,https://github.com/fcitx/fcitx-rime,master,b716234,150804,fcitx-rime-0.3.1-1.gitb716234.fc22.src.rpm
-1,1,brise,https://github.com/rime/brise,master,d6ad164,150907,brise-0.35-2.gitd6ad164.fc22.src.rpm
-1,1,librime,https://github.com/rime/librime,develop,4eade83,150923,librime-1.2-8.git4eade83.fc22.src.rpm
+0,1,fcitx-rime,https://github.com/fcitx/fcitx-rime,master,9351313,151212,fcitx-rime-0.3.1-2.git9351313.fc23.src.rpm
+1,1,brise,https://github.com/rime/brise,master,7dbd56b,160221,brise-0.35-3.git7dbd56b.fc23.src.rpm
+1,1,librime,https://github.com/rime/librime,develop,1da0c63,160328,librime-1.2-9.git1da0c63.fc23.src.rpm
 #1,2,yaml-cpp,https://yaml-cpp.googlecode.com,None,None,140717,el7
 #1,2,glog,https://google-glog.googlecode.com,None,None,140717,el7
 #1,1,gflags,https://github.com/schuhschuh/gflags,feature/%2383-alternative-namespace,1234567,140717,el7
@@ -44,17 +44,17 @@
 1,3,python-mutagen,https://bitbucket.org/lazka/mutagen/downloads,None,d630a68,150910,python-mutagen-1.31-2.fc23.src.rpm
 1,1,python3-xlib,https://github.com/LiuLang/python3-xlib,master,e68a323,141113,python3-xlib-0.15-1.gite68a323.fc22.src.rpm
 1,1,python3-keybinder,https://github.com/LiuLang/python3-keybinder,master,1f633d0,141120,python3-keybinder-1.1.2-1.git1f633d0.fc22.src.rpm
-1,1,python-html2text,https://github.com/Alir3z4/html2text,master,0c70c8f,160108,python-html2text-2016.1.8-1.git0c70c8f.fc23.src.rpm
+1,1,python-html2text,https://github.com/Alir3z4/html2text,master,cff6d96,160402,python-html2text-2016.4.2-1.gitcff6d96.fc23.src.rpm
 
 0,1,pointdownload,https://github.com/PointTeam/PointDownload,develop,cd07f1d,150507,pointdownload-1.2.0-2.gitcd07f1d.fc22.src.rpm
 0,1,simplescreenrecorder,https://github.com/MaartenBaert/ssr,master,c580a19,151205,simplescreenrecorder-0.3.6-1.gitc580a19.fc23.src.rpm
 0,6,youdao-dict,http://cidian.youdao.com/index-linux.html,None,None,151230,youdao-dict-1.1.0-1.fc23.src.rpm
-0,1,obs-studio,https://github.com/jp9000/obs-studio,master,4ce6df0,160223,obs-studio-0.13.2-1.git4ce6df0.fc23.src.rpm
+0,1,obs-studio,https://github.com/jp9000/obs-studio,master,bcdb3dc,160321,obs-studio-0.13.4-1.gitbcdb3dc.fc23.src.rpm
 
-0,7,opera-stable,http://ftp.opera.com/pub/opera/desktop,None,None,160222,opera-stable-35.0.2066.82-1.net.src.rpm
-0,7,opera-beta,http://ftp.opera.com/pub/opera-beta,None,None,160225,opera-beta-36.0.2130.21-1.net.src.rpm
-0,7,opera-developer,http://ftp.opera.com/pub/opera-developer,None,None,160217,opera-developer-37.0.2142.0-1.net.src.rpm
-0,1,freshplayerplugin,https://github.com/i-rinat/freshplayerplugin,master,2b06d00,151220,freshplayerplugin-0.3.4-1.git2b06d00.fc23.src.rpm
+0,7,opera-stable,http://ftp.opera.com/pub/opera/desktop,None,None,160314,opera-stable-36.0.2130.32-1.net.src.rpm
+0,7,opera-beta,http://ftp.opera.com/pub/opera-beta,None,None,160308,opera-beta-36.0.2130.29-1.net.src.rpm
+0,7,opera-developer,http://ftp.opera.com/pub/opera-developer,None,None,160317,opera-developer-37.0.2171.0-1.net.src.rpm
+0,1,freshplayerplugin,https://github.com/i-rinat/freshplayerplugin,master,51946f8,160412,freshplayerplugin-0.3.5-1.git51946f8.fc23.src.rpm
 
 0,1,shadowsocks,https://github.com/mengskysama/shadowsocks-rm,feature-ota,767b921,151216,python-shadowsocks-2.8.3-1.git767b921.fc23.src.rpm
 0,1,shadowsocks-qt5,https://github.com/librehat/shadowsocks-qt5,master,ba70fd1,160110,shadowsocks-qt5-2.6.1-1.gitba70fd1.fc23.src.rpm
@@ -62,8 +62,8 @@
 
 0,5,tragtor,http://repository.mein-neues-blog.de:9000,None,None,150721,tragtor-0.9.2-1.fc23.src.rpm
 0,1,doubanfm-qt,https://github.com/zonyitoo/doubanfm-qt,master,826e8a2,151205,doubanfm-qt-2.2-2.git826e8a2.fc23.src.rpm
-0,1,moonplayer,https://github.com/coslyk/moonplayer,master,b221910,160224,moonplayer-0.57-1.gitb221910.fc23.src.rpm
-0,1,musicbox,https://github.com/darknessomi/musicbox,master,e6428bb,160229,musicbox-0.2.1.3-1.gite6428bb.fc23.src.rpm
+0,1,moonplayer,https://github.com/coslyk/moonplayer,master,c443df9,160410,moonplayer-0.59.1-1.gitc443df9.fc23.src.rpm
+0,1,musicbox,https://github.com/darknessomi/musicbox,master,19661f3,160412,musicbox-0.2.2.2-1.git19661f3.fc23.src.rpm
 
 0,1,deepin-music-player,https://github.com/linuxdeepin/deepin-music,master,c43b01d,150617,deepin-music-player-2.3.0-1.gitc43b01d.fc22.src.rpm
 1,1,deepin-ui,https://github.com/linuxdeepin/deepin-ui,master,8d75806,150701,deepin-ui-1.0.4-1.git8d75806.fc22.src.rpm
@@ -89,7 +89,7 @@
 1,1,dbus-generator,https://github.com/linuxdeepin/go-dbus-generator,master,84ee26c,141120,dbus-generator-0.0.3-1.git84ee26c.fc22.src.rpm
 1,1,golang-dlib,https://github.com/linuxdeepin/go-lib,master,98ac007,150703,golang-dlib-0.3.0-1.git98ac007.fc22.src.rpm
 #1,1,python-xpybutil,https://github.com/BurntSushi/xpybutil,master,8ee7dc4,150318
-1,1,qtav,https://github.com/wang-bin/QtAV,master,1f53443,160228,qtav-1.10.0-1.git1f53443.fc23.src.rpm
+1,1,qtav,https://github.com/wang-bin/QtAV,master,c8f88a0,160328,qtav-1.10.0-2.gitc8f88a0.fc23.src.rpm
 
 0,1,baka-mplayer,https://github.com/u8sand/Baka-MPlayer,master,e1df4b4,151202,baka-mplayer-2.0.4-1.gite1df4b4.fc23.src.rpm
 
@@ -106,29 +106,29 @@
 #!0,1,ue4,https://github.com/EpicGames/UnrealEngine,master,311e18f,141231,ue4-4.9.0-2.git311e18f.fc22.src.rpm
 #!0,10,unity-editor,http://unity3d.com,None,None,141231,unity-editor-5.1.0f3-1.fc22.src.rpm
 
-0,10,nginx,http://nginx.org/en/CHANGES,None,None,160224,nginx-1.9.12-1.modsec_2.9.0.fc23.src.rpm
-1,1,ngx-lua,https://github.com/openresty/lua-nginx-module,master,3b46731,160215
-1,1,ngx-devel,https://github.com/simpl/ngx_devel_kit,master,8dd0df5,130926
+0,10,nginx,http://nginx.org/en/CHANGES,None,None,160405,nginx-1.9.14-1.modsec_2.9.0.fc23.src.rpm
+1,1,ngx-lua,https://github.com/openresty/lua-nginx-module,master,3d61bf4,160309
+1,1,ngx-devel,https://github.com/simpl/ngx_devel_kit,master,f119fe8,160301
 1,1,CoreRuleSet,https://github.com/SpiderLabs/owasp-modsecurity-crs,master,60c8bc9,151030
 1,1,ngx-fancy,https://github.com/aperezdc/ngx-fancyindex,master,c97e11a,160126
-1,1,ngx-echo,https://github.com/openresty/echo-nginx-module,master,7bc71d2,150622
+1,1,ngx-echo,https://github.com/openresty/echo-nginx-module,master,4f7aa50,160211
 0,1,openresty,https://github.com/openresty/ngx_openresty,master,da90bd7,160122,openresty-1.9.7.2-1.modsec_2.9.0.fc23.src.rpm
 0,1,tengine,https://github.com/alibaba/tengine,master,f7b40e5,151231,tengine-2.1.2-1.modsec_2.9.0.fc23.src.rpm
 
 0,1,ircd-hybrid,https://github.com/ircd-hybrid/ircd-hybrid,master,9adca80,160105,ircd-hybrid-8.2.12-1.fc23.src.rpm
-0,1,mu,https://github.com/Kreogist/Mu,master,38bee1a,160229,mu-0.9.210-1.git38bee1a.fc23.src.rpm
+0,1,mu,https://github.com/Kreogist/Mu,master,3aae86e,160322,mu-0.9.245-1.git3aae86e.fc23.src.rpm
 
 0,11,ccal,http://ccal.chinesebay.com/ccal/ccal.htm.html,None,None,120304,ccal-2.5.3-1.fc22.src.rpm
 #!0,22,checkinstall,http://asic-linux.com.mx/~izto/checkinstall,None,None,150203,checkinstall-1.6.3-1.fc23.src.rpm
 
 0,12,sandbox,https://gitweb.gentoo.org/proj/sandbox.git/log,master,767beca,151219,sandbox-2.10-1.fc23.src.rpm
 
-0,1,atom,https://github.com/atom/atom,master,01c7777,160318,atom-1.6.0-2.git01c7777.fc23.src.rpm
-1,1,apm,https://github.com/atom/apm,master,955326e,160303,nodejs-atom-package-manager-1.7.1-3.git955326e.fc23.src.rpm
-1,1,electron,https://github.com/atom/electron,master,ead94b7,160312,electron-0.36.11-1.prebuilt.fc23.src.rpm
+0,1,atom,https://github.com/atom/atom,master,1969903,160419,atom-1.7.2-1.git1969903.fc23.src.rpm
+1,1,apm,https://github.com/atom/apm,master,def66c9,160329,nodejs-atom-package-manager-1.9.2-10.gitdef66c9.fc23.src.rpm
+1,1,electron,https://github.com/electron/electron,master,c04d43c,160422,electron-0.37.7-1.gitc04d43c.fc23.src.rpm
 0,1,brackets,https://github.com/adobe/brackets,master,3df0ac6,160112,brackets-1.6-1.fc23.src.rpm
 1,1,brackets-shell,https://github.com/adobe/brackets-shell,master,1363c89,151212
-0,1,vscode,https://github.com/Microsoft/vscode,master,5b5f4db,160307,vscode-0.10.10-3.fc23.src.rpm
+0,1,vscode,https://github.com/Microsoft/vscode,master,fa6d0f0,160414,vscode-1.0.0-1.fc23.src.rpm
 
 #!0,13,oracle-jdk8,http://www.oracle.com/technetwork/java/javase,None,None,151222,oracle-jdk8-1.8.0.72-1.net.src.rpm
 #!0,13,oracle-jdk7,http://www.oracle.com/technetwork/java/javase/archive-139210.html,None,None,151222,oracle-jdk7-1.7.0.80-1.net.src.rpm
@@ -138,18 +138,21 @@
 #!0,16,FoxitReader,http://cdn02.foxitsoftware.com/pub/foxit/reader/desktop/linux/1.x/1.1/enu,None,None,141231,FoxitReader-1.1.0-1.fc23.src.rpm,https://github.com/archlinuxcn/repo/commit/ceff4a52428e36beb0ed5d13307df21bfcb554b2
 1,20,qt-installer-frame,http://download.qt.io/official_releases/qt-installer-framework,None,None,150602,qt-installer-framework-2.0.1-1.fc23.src.rpm
 
-0,21,pycharm-community,https://data.services.jetbrains.com/products/releases?code=PCP%2PCC&latest=true&type=release,None,None,160128,pycharm-community-5.0.4-1.net.src.rpm
-0,21,pycharm-professional,https://data.services.jetbrains.com/products/releases?code=PCP%2PCC&latest=true&type=release,None,None,160128,pycharm-professional-5.0.4-1.net.src.rpm
+0,21,pycharm-community,https://data.services.jetbrains.com/products/releases?code=PCP%2PCC&latest=true&type=release,None,None,160323,pycharm-community-2016.1-1.net.src.rpm
+0,21,pycharm-professional,https://data.services.jetbrains.com/products/releases?code=PCP%2PCC&latest=true&type=release,None,None,160323,pycharm-professional-2016.1-1.net.src.rpm
 
 0,1,xx-net,https://github.com/XX-net/XX-Net,master,262bc73,160228,xx-net-2.9.1-1.git262bc73.fc23.src.rpm
 0,1,gmediarender,https://github.com/hzeller/gmrender-resurrect,master,4003616,151105,gmediarender-0.0.7-1.git4003616.fc23.src.rpm
-0,1,lantern,https://github.com/getlantern/lantern,valencia,273a629,160229,golang-github-getlantern-lantern-2.1.0-3.git273a629.fc23.src.rpm
+0,1,lantern,https://github.com/getlantern/lantern,valencia,65615be,160416,golang-github-getlantern-lantern-2.2.0-1.git65615be.fc23.src.rpm
 
-0,1,FeelUOwn,https://github.com/cosven/FeelUOwn,master,166205e,160224,feeluown-7.1-0.1.git166205e.fc23.src.rpm
+0,1,FeelUOwn,https://github.com/cosven/FeelUOwn,master,a6d4cde,160319,feeluown-8.0-0.1.gita6d4cde.fc23.src.rpm
 0,1,osdlyrics,https://github.com/PedroHLC/osdlyrics,legacy-dev,33f67b4,151214,osdlyrics-0.4.3-1.git33f67b4.fc23.src.rpm
-0,1,wechat,https://github.com/geeeeeeeeek/electronic-wechat,master,6704050,160317,wechat-1.1.1-1.git6704050.fc23.src.rpm
-0,1,n1,https://github.com/nylas/N1,master,8cb7748,160318,n1-0.4.16-1.git8cb7748.fc23.src.rpm
-0,1,rocketchat,https://github.com/RocketChat/Rocket.Chat.Electron,master,abb7b81,160308,rocketchat-1.2.0-1.gitabb7b81.fc23.src.rpm
+0,1,wechat,https://github.com/geeeeeeeeek/electronic-wechat,master,275edce,160421,wechat-1.2.0-1.git275edce.fc23.src.rpm
+0,1,n1,https://github.com/nylas/N1,master,a22631a,160413,n1-0.4.25-1.gita22631a.fc23.src.rpm
+0,1,rocketchat,https://github.com/RocketChat/Rocket.Chat.Electron,master,f74b825,160321,rocketchat-1.2.0-2.gitabb7b81.fc23.src.rpm
+
+0,1,lighttable,https://github.com/LightTable/LightTable,master,53a90be,160122,lighttable-0.8.1-2.fc23.src.rpm
+1,1,leiningen,https://github.com/technomancy/leiningen,master,f9a464e,160209,leiningen-2.6.1-1.fc23.src.rpm
 
 # Wait
 #0,1,deepin-translator,https://github.com/linuxdeepin/deepin-translator,master,1234567,141231
