@@ -260,11 +260,12 @@ class Helper(object):
         global opts
         opts = {
             'thread_num': 10,
-            'data_file' : 'checker_data.csv',
+            'input_file': 'checker_data.csv',
             'user_agent': None,
             'proxy'     : None,
-            'mode'      : 'thread'
+            'mode'      : 'aio'
         }
+        self.helper()
         self.q = Queue()
         self.localtime(1)
 
@@ -283,7 +284,7 @@ class Helper(object):
         return list '''
 
         csvlist = []
-        with open(opts['data_file'], 'r') as csvfile:
+        with open(opts['input_file'], 'r') as csvfile:
             content = csv.reader(csvfile, delimiter=',', quotechar='|')
             for row in content:
                 if len(row) != 0 and row[0][0] != "#":
@@ -333,7 +334,7 @@ class Helper(object):
 
         parser.add_argument('-f', '--file', metavar='PATH',
                             dest='files', action='store',
-                            help='{_name} data(csv) full path'.format(
+                            help='{_name} data file(csv) full path'.format(
                                 _name=_project.lower()))
 
         parser.add_argument('-U', '--user-agent', metavar='AGENT', type=str,
@@ -345,8 +346,8 @@ class Helper(object):
                             help='use proxy on given port')
 
         parser.add_argument('-m', '--mode', dest='mode', action='store',
-                            choices={'thread','aio'}, default='thread',
-                            help='multi-tasking mode(default: thread)')
+                            choices={'thread','aio'}, default='aio',
+                            help='multi-tasking mode(default: aio)')
 
         parser.add_argument('-v', '--version', dest='version', action='store_true',
                             help='output version information and exit')
@@ -358,17 +359,8 @@ class Helper(object):
                   _project, _version, _author, _email, _github))
             sys.exit()
 
-        if args.mode:
-            opts['mode'] = args.mode
-
-        if args.proxy:
-            opts['proxy'] = re.split('://', args.proxy)
-
-        if args.user_agent:
-            opts['user_agent'] = args.user_agent
-
         if args.files and os.path.exists(args.files):
-            opts['data_file'] = args.files
+            opts['input_file'] = args.files
         elif args.files is not None:
             print("{}: cannot access '{}': No such file or directory"
                 .format(_project, args.files))
@@ -376,6 +368,12 @@ class Helper(object):
 
         if args.numbers:
             opts['thread_num'] = args.numbers
+        if args.user_agent:
+            opts['user_agent'] = args.user_agent
+        if args.proxy:
+            opts['proxy'] = re.split('://', args.proxy)
+        if args.mode:
+            opts['mode'] = args.mode
 
     def working(self):
         ''' get content from queue. '''
@@ -409,7 +407,6 @@ class Helper(object):
 
 if __name__ == "__main__":
     tools = Helper()
-    tools.helper()
 
     objlist = []
     for i in tools.inputs():
