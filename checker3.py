@@ -179,7 +179,7 @@ class Checker(object):
             p1 = self.get_page(release_url)
             self.release_date, self.release_com = self.get_date(p1), self.get_commit(p1)
             self.latest_date, self.latest_com = self.release_date, self.release_com
-        else:
+        elif self.url_type != "2":
             release_url = self.url + "/releases"
             latest_url = self.url + "/commits/" + self.branch
 
@@ -240,7 +240,7 @@ class CheckerAIO(Checker):
             p1 = yield from self.get_page(release_url)
             self.release_date, self.release_com = self.get_date(p1), self.get_commit(p1)
             self.latest_date, self.latest_com = self.release_date, self.release_com
-        else:
+        elif self.url_type != "2":
             release_url = self.url + "/releases"
             latest_url = self.url + "/commits/" + self.branch
 
