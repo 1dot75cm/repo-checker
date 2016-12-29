@@ -11,22 +11,22 @@
     0.1 - Initial version (2016.02.26)
 '''
 
+from __future__ import print_function, unicode_literals
 import os
 import sys
 import re
 import polib
-import urllib.parse, urllib.request
+import requests
 import argparse
 
 def get_translate(text):
-    url = 'http://translate.google.cn/?hl=en&sl=en&tl=zh-CN'
-    post = urllib.parse.urlencode({'text': text})
-    req = urllib.request.Request(url, data = post.encode())
-    req.add_header("User-Agent", "Mozilla/5.0")
-    resp = urllib.request.urlopen(req)
-    page = resp.read()
-    trans = re.search(b"TRANSLATED_TEXT='(.*?)';", page).group(1)
-    return trans.decode()
+    url = 'http://translate.google.cn/'
+    data = dict(hl='en', sl='en', tl='zh-CN', text=text)
+    headers = {'User-Agent': 'Mozilla/5.0'}
+    resp = requests.get(url, params=data, headers=headers)
+    if resp.ok:
+        return re.search("TRANSLATED_TEXT='(.*?)';", resp.text).group(1)
+    return ""
 
 def replace_words(text, word_dict):
     ''' https://segmentfault.com/q/1010000002474308 '''
@@ -77,6 +77,8 @@ if __name__ == '__main__':
          '"':'_dd_',
          '&':'_amp_',
          '$':'_amb_',
+         '%':'_amc_',
+         '=':'_eq_',
          '/':'_es_',
          '\n':'_cs_'
         }
@@ -85,4 +87,3 @@ if __name__ == '__main__':
 
     helper()
     open_pofile()
-
