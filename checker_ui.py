@@ -6,12 +6,13 @@ try:
         QAction, QSpacerItem, QSizePolicy, QMenuBar, QMenu, QStatusBar,
         QWidget, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QProgressBar,
         QInputDialog, QFileDialog, QMessageBox)
+    from PyQt5.QtGui import QColor
 except:
     from PyQt4.QtCore import Qt, QSize, QRect, QThread, pyqtSignal
     from PyQt4.QtGui import (QApplication, QMainWindow, QHBoxLayout, QVBoxLayout,
         QAction, QSpacerItem, QSizePolicy, QMenuBar, QMenu, QStatusBar,
         QWidget, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QProgressBar,
-        QInputDialog, QFileDialog, QMessageBox)
+        QInputDialog, QFileDialog, QMessageBox, QColor)
 
 from lxml import etree
 from dateutil.parser import parse
@@ -62,6 +63,9 @@ class MainWindow(QMainWindow):
     tableHeaders = ["Name", "URL", "Branch", "RPM date/commit", "Release date/commit",
                     "Latest date/commit", "Status", "Comment"]
     wtime = [0, 0]
+    bgColor = QColor(180, 200, 230, 40)
+    tableColumnCount = 8
+    tableRowCount = 10
 
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -304,9 +308,12 @@ class MainWindow(QMainWindow):
 
         for n, i in enumerate(tableContents):
             items = i.dump_info()
-            for j in range(8):
+            for j in range(self.tableWidget.columnCount()):
                 item = QTableWidgetItem(items[j])
                 self.tableWidget.setItem(n, j, item)
+            self.setStatusColor(n)
+
+        self.setBackgroundColor(self.bgColor)
 
         if end:
             self.wtime[1] = int(time.time())
@@ -376,6 +383,25 @@ class MainWindow(QMainWindow):
                 except AttributeError:
                     QMessageBox.warning(self, "Error", "Save file failed.")
 
+    def setBackgroundColor(self, color):
+        """修改背景色"""
+        for i in range(self.tableWidget.rowCount()):
+            if i % 2 != 0:
+                for j in range(self.tableWidget.columnCount()):
+                    item = self.tableWidget.item(i, j)
+                    if item:
+                        item.setBackground(color)
+
+    def setStatusColor(self, rowIndex):
+        """修改状态文字颜色"""
+        item = self.tableWidget.item(rowIndex, 6)
+        if item.text() == "normal":
+            item.setForeground(Qt.darkGreen)
+        elif item.text() == "update":
+            item.setForeground(Qt.darkRed)
+        elif item.text() == "none":
+            item.setForeground(Qt.gray)
+
     def setupTable(self):
         """初始化列表"""
         self.tableWidget.setFocusPolicy(Qt.NoFocus)  # 无焦点
@@ -386,16 +412,16 @@ class MainWindow(QMainWindow):
         #self.tableWidget.horizontalHeader().setSortIndicatorShown(True)  # 排序指示器
         self.tableWidget.horizontalHeader().setStretchLastSection(True)  # 扩展最后一列
 
-        self.tableWidget.setColumnCount(8)  # 列数
-        self.tableWidget.setRowCount(10)  # 行数
+        self.tableWidget.setColumnCount(self.tableColumnCount)  # 列数
+        self.tableWidget.setRowCount(self.tableRowCount)  # 行数
 
         # 行头
-        for i in range(10):
+        for i in range(self.tableRowCount):
             item = QTableWidgetItem(self.tr("%s"%(i+1)))
             self.tableWidget.setVerticalHeaderItem(i, item)  # 行号
 
         # 列头
-        for i in range(8):
+        for i in range(self.tableColumnCount):
             item = QTableWidgetItem(self.tr(self.tableHeaders[i]))  # QIcon, str
             self.tableWidget.setHorizontalHeaderItem(i, item)  # 初始化表头
 
@@ -403,11 +429,13 @@ class MainWindow(QMainWindow):
             self.tableWidget.resizeColumnToContents(i)  # 根据内容调整列宽
 
         # 初始化项目
-        for i in range(10):
+        for i in range(self.tableRowCount):
             tableContents.append(Checker())
-            for j in range(7):
+            for j in range(self.tableColumnCount):
                 item = QTableWidgetItem()
                 self.tableWidget.setItem(i, j, item)
+
+        self.setBackgroundColor(self.bgColor)
 
 
 class Checker(object):
@@ -514,7 +542,7 @@ class Checker(object):
         elif re.search('sogou', self.url):
             return [self.url]
         else:
-            return False
+            return [self.url, self.url]
 
     def get_rules(self):
         """获取 xpath 规则"""
