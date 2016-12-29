@@ -1,0 +1,4 @@
+PyQt5==5.7
+requests==2.12.1
+lxml==3.7.1
+python-dateutil==2.6.0
