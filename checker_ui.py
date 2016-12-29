@@ -308,7 +308,7 @@ class MainWindow(QMainWindow):
         self.tableWidget.setRowCount(len(tableContents))  # 行数
 
         for n, i in enumerate(tableContents):
-            items = i.dump_info()
+            items = i.dump()
             for j in range(self.tableWidget.columnCount()):
                 item = QTableWidgetItem(items[j])
                 self.tableWidget.setItem(n, j, item)
@@ -403,7 +403,7 @@ class MainWindow(QMainWindow):
             if fname:
                 try:
                     with open(fname, 'w') as fp:
-                        json.dump([i.dump() for i in tableContents], fp, ensure_ascii=False)
+                        json.dump([i.dump(mode="raw") for i in tableContents], fp, ensure_ascii=False)
                     self.statusbar.showMessage("saved successfully")
                 except AttributeError:
                     QMessageBox.warning(self, "Error", "Save file failed.")
@@ -482,37 +482,6 @@ class Checker(object):
         self.check_date = ""
         self.type = ""
 
-    def load(self, column, value):
-        if column == 0:
-            self.name = value
-        elif column == 1:
-            self.url = value
-        elif column == 2:
-            self.branch = value
-        elif column == 3:
-            self.load_status(value)
-        elif column == 4:
-            self.load_status(value, "release")
-        elif column == 5:
-            self.load_status(value, "latest")
-        elif column == 6:
-            self.status = value
-        elif column == 7:
-            self.comment = value
-        else:
-            self.rules = value
-
-    def dump(self):
-        return dict(
-            name = self.name,
-            url = self.url,
-            branch = self.branch,
-            rpm_date = self.rpm_date,
-            rpm_commit = self.rpm_commit,
-            rules = self.rules,
-            comment = self.comment
-        )
-
     @staticmethod
     def ctime(timestamp):
         """Convert time format"""
@@ -529,8 +498,8 @@ class Checker(object):
         else:
             return timestamp
 
-    def dump_status(self, dump_type="rpm"):
-        """导出状态信息"""
+    def _dump_meta(self, dump_type="rpm"):
+        """导出时间/提交信息"""
         if dump_type == "rpm":
             return "%s [%s]" % (self.ctime(self.rpm_date), self.rpm_commit)
         elif dump_type == "release":
@@ -538,8 +507,8 @@ class Checker(object):
         elif dump_type == "latest":
             return "%s [%s]" % (self.ctime(self.latest_date), self.latest_commit)
 
-    def load_status(self, data, load_type="rpm"):
-        """导入状态信息"""
+    def _load_meta(self, data, load_type="rpm"):
+        """导入时间/提交信息"""
         try:
             if load_type == "rpm":
                 self.rpm_date = self.ctime(data.split()[0])
@@ -553,11 +522,44 @@ class Checker(object):
         except ValueError:
             pass
 
-    def dump_info(self):
+    def load(self, column, value):
+        """按列导入项"""
+        if column == 0:
+            self.name = value
+        elif column == 1:
+            self.url = value
+        elif column == 2:
+            self.branch = value
+        elif column == 3:
+            self._load_meta(value)
+        elif column == 4:
+            self._load_meta(value, "release")
+        elif column == 5:
+            self._load_meta(value, "latest")
+        elif column == 6:
+            self.status = value
+        elif column == 7:
+            self.comment = value
+        else:
+            self.rules = value
+
+    def dump(self, mode="human"):
         """输出对象信息"""
-        return (self.name, self.url, self.branch,
-                self.dump_status(), self.dump_status("release"),
-                self.dump_status("latest"), self.status, self.comment)
+        if mode == "human":
+            return (self.name, self.url, self.branch,
+                    self._dump_meta(), self._dump_meta("release"),
+                    self._dump_meta("latest"), self.status, self.comment)
+
+        elif mode == "raw":
+            return dict(
+                name=self.name,
+                url=self.url,
+                branch=self.branch,
+                rpm_date=self.rpm_date,
+                rpm_commit=self.rpm_commit,
+                rules=self.rules,
+                comment=self.comment
+            )
 
     def get_urls(self):
         """获取 url 列表"""
@@ -583,12 +585,12 @@ class Checker(object):
         }
         return requests.get(url, params, headers=headers, **kwargs)
 
-    def _get_info(self, url, rules):
+    def _extract_info(self, url, rules):
         """根据规则, 提取更新信息"""
         _data = []
         resp = self.get(url)
         if not resp.ok:
-            return [("none", "error"), ("none", "error")]
+            return ("none", "error")
 
         logging.debug("rules: %s, %s" % (rules[0], rules[1]))
         tree = etree.HTML(resp.text)
@@ -610,7 +612,7 @@ class Checker(object):
             dt = parse(data)
             return int(time.mktime(dt.timetuple()))  # int(dt.timestamp())
         except ValueError:
-            return data.split("/")[-1][:7]
+            return data.split("/")[-1][:7]  # commit
         except IndexError:  # no data
             return ""
 
@@ -629,10 +631,10 @@ class Checker(object):
 
             if self.isrelease(url):
                 self.release_date, self.release_commit = \
-                    self._get_info(url, rules)
+                    self._extract_info(url, rules)
             else:
                 self.latest_date, self.latest_commit = \
-                    self._get_info(url, rules)
+                    self._extract_info(url, rules)
 
         self.check_date = int(time.time())
 
