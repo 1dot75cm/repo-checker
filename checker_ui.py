@@ -20,6 +20,7 @@ from datetime import datetime
 import re
 import os
 import sys
+import csv
 import time
 import json
 import requests
@@ -74,7 +75,7 @@ class MainWindow(QMainWindow):
     def setupUi(self, MainWindow):
         """初始化主窗口"""
         MainWindow.setObjectName("MainWindow")
-        MainWindow.setMinimumSize(QSize(905, 450))
+        MainWindow.setMinimumSize(QSize(910, 450))
         MainWindow.setWindowTitle(self.tr("Checker"))
         MainWindow.setAnimated(True)
 
@@ -358,6 +359,26 @@ class MainWindow(QMainWindow):
         else:
             QMessageBox.aboutQt(self, "Checker")
 
+    def loadCsvFile(self, fname):
+        """load csv file (old format)"""
+        _data = []
+        with open(fname, 'r') as fp:
+            content = csv.reader(fp, delimiter=',', quotechar='|')
+            for row in content:
+                if len(row) and row[0][0] != "#":
+                    _data.append(dict(
+                        name=row[2],
+                        url=row[3],
+                        branch=row[4],
+                        rpm_commit=row[5],
+                        rpm_date=int(time.mktime(
+                                    datetime.strptime(row[6], "%y%m%d")
+                                            .timetuple())),
+                        rules=[("", ""), ("", "")],
+                        comment=""
+                    ))
+            self.loadData(_data)
+
     def showFileDialogSlot(self):
         """打开/保存数据至文件"""
         if self.sender().objectName() == "open":
@@ -366,12 +387,16 @@ class MainWindow(QMainWindow):
                 try:
                     with open(fname, 'r') as fp:
                         self.loadData(json.load(fp))
-                    self.updateTableSlot(0)  # 更新列表控件
-                    self.statusbar.showMessage("open successfully")
                 except AttributeError:
                     QMessageBox.warning(self, "Error", "Open file failed.")
                 except json.decoder.JSONDecodeError:
-                    QMessageBox.warning(self, "Error", "The file does not contain JSON.")
+                    try:  # load csv file (old format)
+                        self.loadCsvFile(fname)
+                    except:
+                        QMessageBox.warning(self, "Error", "The file does not contain JSON or CSV.")
+
+                self.updateTableSlot(0)  # 更新列表控件
+                self.statusbar.showMessage("open successfully")
 
         elif self.sender().objectName() in ["save", "save_as"]:
             fname, _ = QFileDialog.getSaveFileName(self, "Save file", os.getcwd())
