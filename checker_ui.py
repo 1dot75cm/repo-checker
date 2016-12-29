@@ -498,12 +498,22 @@ class Checker(object):
         """获取 xpath 规则"""
         return self.rules
 
+    def get(self, url, params=None, **kwargs):
+        headers = {
+            'Accept': '*/*',
+            'Accept-Encoding': 'gzip, deflate',
+            'Connection': 'keep-alive',
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 '
+                          '(KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36'
+        }
+        return requests.get(url, params, headers=headers, **kwargs)
+
     def _get_info(self, url, rules):
         """根据规则, 提取更新信息"""
         _data = []
-        resp = requests.get(url)
+        resp = self.get(url)
         if not resp.ok:
-            return
+            return [("none", "error"), ("none", "error")]
 
         logging.debug("rules: %s, %s" % (rules[0], rules[1]))
         tree = etree.HTML(resp.text)
