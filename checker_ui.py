@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 try:
     from PyQt5.QtCore import Qt, QSize, QRect, QThread, pyqtSignal
     from PyQt5.QtWidgets import (QApplication, QMainWindow, QHBoxLayout, QVBoxLayout,
@@ -15,6 +15,7 @@ except:
 
 from lxml import etree
 from dateutil.parser import parse
+from datetime import datetime
 import re
 import os
 import sys
@@ -235,6 +236,7 @@ class MainWindow(QMainWindow):
                 destItems = self.getRow(destRow)
                 self.setRow(destRow, sourceItems)
                 self.setRow(sourceRow, destItems)
+                self.tableWidget.selectRow(destRow)  # 修改焦点
                 logging.debug(tableContents)
         except AttributeError:
             if self.sender().objectName() == "up":
@@ -265,6 +267,7 @@ class MainWindow(QMainWindow):
         rowIndex = self.tableWidget.rowCount()
         self.tableWidget.setRowCount(rowIndex + 1)
         tableContents.append(Checker())
+        self.updateTableSlot(0)  # 更新列表控件
         logging.debug(tableContents)
 
     def delRowSlot(self):
@@ -281,7 +284,7 @@ class MainWindow(QMainWindow):
     def loadData(self, data):
         """载入数据"""
         global tableContents
-        tableContents = []
+        tableContents = []  # list.clear() Python 3
         for i in data:
             tableContents.append(Checker(i))
 
@@ -297,11 +300,12 @@ class MainWindow(QMainWindow):
     def updateTableSlot(self, val, end=False):
         """线程通过该槽，刷新进度条，表格内容"""
         self.progressBar.setValue(val)
-
         self.tableWidget.setRowCount(len(tableContents))  # 行数
+
         for n, i in enumerate(tableContents):
+            items = i.dump_info()
             for j in range(8):
-                item = QTableWidgetItem(i.dump_info()[j])
+                item = QTableWidgetItem(items[j])
                 self.tableWidget.setItem(n, j, item)
 
         if end:
@@ -411,8 +415,8 @@ class Checker(object):
         self.name = item['name'] if item else ""
         self.url = item['url'] if item else ""
         self.branch = item['branch'] if item else ""
-        self.rpm_date = item['rpm_date'] if item else ""
-        self.rpm_commit = item['rpm_commit'] if item else ""
+        self.rpm_date = item['rpm_date'] if item else "none"
+        self.rpm_commit = item['rpm_commit'] if item else "none"
         self.rules = item['rules'] if item else [("", ""), ("", "")]
         #self.urls = item['urls']
         self.comment = item['comment'] if item else ""
@@ -456,26 +460,42 @@ class Checker(object):
             comment = self.comment
         )
 
+    @staticmethod
+    def ctime(timestamp):
+        """Convert time format"""
+        if len(str(timestamp)) == 10:
+            # timestamp -> string
+            return datetime.fromtimestamp(float(timestamp))\
+                           .strftime("%y%m%d")
+        elif len(str(timestamp)) == 6:
+            # string -> timestamp
+            #int(datetime.strptime(str(timestamp), "%y%m%d").timestamp())  # Python 3
+            return int(time.mktime(
+                        datetime.strptime(str(timestamp), "%y%m%d")\
+                                .timetuple()))
+        else:
+            return timestamp
+
     def dump_status(self, dump_type="rpm"):
         """导出状态信息"""
         if dump_type == "rpm":
-            return "%s [%s]" % (self.rpm_date, self.rpm_commit)
+            return "%s [%s]" % (self.ctime(self.rpm_date), self.rpm_commit)
         elif dump_type == "release":
-            return "%s [%s]" % (self.release_date, self.release_commit)
+            return "%s [%s]" % (self.ctime(self.release_date), self.release_commit)
         elif dump_type == "latest":
-            return "%s [%s]" % (self.latest_date, self.latest_commit)
+            return "%s [%s]" % (self.ctime(self.latest_date), self.latest_commit)
 
     def load_status(self, data, load_type="rpm"):
         """导入状态信息"""
         try:
             if load_type == "rpm":
-                self.rpm_date = int(data.split()[0])
+                self.rpm_date = self.ctime(data.split()[0])
                 self.rpm_commit = data.split()[1][1:-1]
             elif load_type == "release":
-                self.release_date = int(data.split()[0])
+                self.release_date = self.ctime(data.split()[0])
                 self.release_commit = data.split()[1][1:-1]
             elif load_type == "latest":
-                self.latest_date = int(data.split()[0])
+                self.latest_date = self.ctime(data.split()[0])
                 self.latest_commit = data.split()[1][1:-1]
         except ValueError:
             pass
@@ -491,6 +511,8 @@ class Checker(object):
         if re.search('github', self.url):
             self.type = "github"
             return [self.url + '/releases', self.url + '/commits/' + self.branch]
+        elif re.search('sogou', self.url):
+            return [self.url]
         else:
             return False
 
@@ -519,24 +541,30 @@ class Checker(object):
         tree = etree.HTML(resp.text)
         if isinstance(rules, (list, tuple)):
             for rule in rules:
+                if not rule:
+                    _data.append("")
+                    break
+
                 logging.debug("match: %s" % tree.xpath(rule)[0])
                 _data.append(
-                    self._process_data(tree.xpath(rule)))
+                    self._process_data(tree.xpath(rule)[0]))
 
             return _data  # (date, commit)
 
     def _process_data(self, data):
         """处理数据"""
         try:
-            dt = parse(data[0])
-            return int(dt.timestamp())
+            dt = parse(data)
+            return int(time.mktime(dt.timetuple()))  # int(dt.timestamp())
         except ValueError:
-            return data[0].split("/")[-1][:7]
+            return data.split("/")[-1][:7]
         except IndexError:  # no data
             return ""
 
     def isrelease(self, url):
         if re.search('releases', url):
+            return True
+        elif re.search('sogou', url):
             return True
 
         return False
@@ -557,7 +585,7 @@ class Checker(object):
 
     def run_check(self):
         """检查更新, 并更新状态"""
-        logging.debug("starting...")
+        logging.info("starting...")
         if not self.rules[0][0]:  # 空行
             return
 
