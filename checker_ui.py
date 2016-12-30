@@ -14,6 +14,7 @@ except:
         QWidget, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QProgressBar,
         QInputDialog, QFileDialog, QMessageBox, QColor)
 
+from queue import Queue
 from lxml import etree
 from dateutil.parser import parse
 from datetime import datetime
@@ -34,23 +35,21 @@ __author__ = "mosquito"
 __email__ = "sensor.wen@gmail.com"
 
 # xpath 规则 -> 处理函数 -> 内容
-tableContents = []
 
 
 class WorkThread(QThread):
-    triggered = pyqtSignal(int, bool)
-    step = 0
+    triggered = pyqtSignal(int)
 
-    def __int__(self):
+    def __init__(self, queue):
         super(WorkThread, self).__init__()
+        self.queue = queue
 
     def run(self):
-        for i in tableContents:
-            i.run_check()
-            self.step += 100 / len(tableContents)
-            self.triggered.emit(self.step, False)
-
-        self.triggered.emit(self.step, True)
+        while True:
+            task = self.queue.get()
+            task.run_check()
+            self.triggered.emit(1)
+            self.queue.task_done()
 
 
 class MainWindow(QMainWindow):
@@ -63,10 +62,16 @@ class MainWindow(QMainWindow):
     """ % (__version__, __descript__, __url__, __license__, __email__, __author__)
     tableHeaders = ["Name", "URL", "Branch", "RPM date/commit", "Release date/commit",
                     "Latest date/commit", "Status", "Comment"]
-    wtime = [0, 0]
-    bgColor = QColor(180, 200, 230, 40)
+    tableContents = []
     tableColumnCount = 8
     tableRowCount = 10
+    workerCount = 5  # 线程数
+    workers = []  # 保存线程对象
+    q = Queue()
+    wtime = [0, 0]
+    bgColor = QColor(180, 200, 230, 40)
+    progressVal = 0
+    taskVal = 0
 
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -118,14 +123,14 @@ class MainWindow(QMainWindow):
         self.horizontalLayout.addItem(spacerItem)
 
         self.progressBar = QProgressBar(self.centralwidget)
-        self.progressBar.setValue(0)
         self.progressBar.hide()
-        self.workThread = WorkThread()  # 耗时任务需要用线程执行，再刷新进度条
         self.horizontalLayout.addWidget(self.progressBar)
 
         self.label = QLabel(self.centralwidget)
-        self.label.setText(self.tr("TextLabel"))
         self.horizontalLayout.addWidget(self.label)
+
+        spacerItem = QSpacerItem(40, 20, QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
+        self.horizontalLayout.addItem(spacerItem)
 
         self.checkButton = QPushButton(self.centralwidget)
         self.checkButton.setText(self.tr("Check"))
@@ -203,7 +208,6 @@ class MainWindow(QMainWindow):
         self.checkButton.clicked.connect(self.checkUpdateSlot)
         self.updateButton.clicked.connect(self.updateTableItemSlot)
         self.editRuleButton.clicked.connect(self.editTableItemRuleSlot)
-        self.workThread.triggered.connect(self.updateTableSlot)
         self.aboutAction.triggered.connect(self.showAboutDialogSlot)
         self.aboutQtAction.triggered.connect(self.showAboutDialogSlot)
         self.openAction.triggered.connect(self.showFileDialogSlot)
@@ -227,7 +231,7 @@ class MainWindow(QMainWindow):
     def itemChangedSlot(self, item):  # QTableWidgetItem
         """捕获itemChanged信号, 修改表项"""
         try:
-            tableContents[item.row()].load(item.column(), item.text())
+            self.tableContents[item.row()].load(item.column(), item.text())
         except IndexError:
             pass
 
@@ -242,7 +246,7 @@ class MainWindow(QMainWindow):
                 self.setRow(destRow, sourceItems)
                 self.setRow(sourceRow, destItems)
                 self.tableWidget.selectRow(destRow)  # 修改焦点
-                logging.debug(tableContents)
+                logging.debug(self.tableContents)
         except AttributeError:
             if self.sender().objectName() == "up":
                 QMessageBox.warning(self, "Warning", "The row is to top.")
@@ -255,14 +259,14 @@ class MainWindow(QMainWindow):
         for i in range(7):
             item = self.tableWidget.item(rowIndex, i)
             rowItems.append(item.text())
-        rowItems.append(tableContents[rowIndex].rules)
+        rowItems.append(self.tableContents[rowIndex].rules)
         return rowItems
 
     def setRow(self, rowIndex, rowItems):
         """设置行"""
         for n, i in enumerate(rowItems):
             if n == len(rowItems) - 1:
-                tableContents[rowIndex].rules = i
+                self.tableContents[rowIndex].rules = i
             else:
                 item = self.tableWidget.item(rowIndex, n)
                 item.setText(i)
@@ -271,9 +275,9 @@ class MainWindow(QMainWindow):
         """添加行"""
         rowIndex = self.tableWidget.rowCount()
         self.tableWidget.setRowCount(rowIndex + 1)
-        tableContents.append(Checker())
+        self.tableContents.append(Checker())
         self.updateTableSlot(0)  # 更新列表控件
-        logging.debug(tableContents)
+        logging.debug(self.tableContents)
 
     def delRowSlot(self):
         """删除行"""
@@ -281,33 +285,44 @@ class MainWindow(QMainWindow):
         rowIndex = self.tableWidget.currentRow()
         if rowIndex != -1:
             self.tableWidget.removeRow(rowIndex)
-            tableContents.remove(tableContents[rowIndex])
-            logging.debug(tableContents)
+            self.tableContents.remove(self.tableContents[rowIndex])
+            logging.debug(self.tableContents)
         else:
             QMessageBox.warning(self, "Warning", "Please select a row.")
 
     def loadData(self, data):
         """载入数据"""
-        global tableContents
-        tableContents = []  # list.clear() Python 3
+        self.tableContents = []  # list.clear() Python 3
         for i in data:
-            tableContents.append(Checker(i))
+            self.tableContents.append(Checker(i))
 
     def checkUpdateSlot(self):
         """执行更新检查"""
-        self.wtime[0] = int(time.time())
+        self.wtime[0] = int(time.time())  # 计时
         self.statusbar.showMessage("checking...")
         self.progressBar.setValue(0)
         self.progressBar.show()
-        # 执行工作线程
-        self.workThread.start()
+        self.progressVal = 0
 
-    def updateTableSlot(self, val, end=False):
+        for t in range(self.workerCount):
+            t = WorkThread(self.q)  # 耗时任务需要用线程执行，再刷新进度条
+            t.triggered.connect(self.updateTableSlot)
+            self.workers.append(t)
+            t.start()  # 执行工作线程
+
+        # 填充队列
+        for item in self.tableContents:
+            self.q.put(item)
+
+    def updateTableSlot(self, val):
         """线程通过该槽，刷新进度条，表格内容"""
-        self.progressBar.setValue(val)
-        self.tableWidget.setRowCount(len(tableContents))  # 行数
+        self.taskVal += val
+        self.progressVal = self.taskVal / len(self.tableContents) * 100
+        self.progressBar.setValue(self.progressVal)
+        self.label.setText("%s/%s"%(self.taskVal, len(self.tableContents)))
+        self.tableWidget.setRowCount(len(self.tableContents))  # 行数
 
-        for n, i in enumerate(tableContents):
+        for n, i in enumerate(self.tableContents):
             items = i.dump()
             for j in range(self.tableWidget.columnCount()):
                 item = QTableWidgetItem(items[j])
@@ -316,7 +331,7 @@ class MainWindow(QMainWindow):
 
         self.setBackgroundColor(self.bgColor)
 
-        if end:
+        if self.progressVal == 100:
             self.wtime[1] = int(time.time())
             self.statusbar.showMessage(
                 "finished (work time %ds)" % (self.wtime[1] - self.wtime[0]))
@@ -328,7 +343,7 @@ class MainWindow(QMainWindow):
             try:
                 item = self.tableWidget.item(rowIndex, 4)
                 self.tableWidget.item(rowIndex, 3).setText(item.text())
-                tableContents[rowIndex].load_status(item.text())
+                self.tableContents[rowIndex].load_status(item.text())
             except (IndexError, AttributeError):
                 QMessageBox.warning(self, "Warning", "The row is empty.")
         else:
@@ -343,10 +358,10 @@ class MainWindow(QMainWindow):
                 rules, ok = QInputDialog.getMultiLineText(self, "Edit rule",
                     "XPath rule(format: \"[(time, commit), (time, commit)]\"):",
                     re.sub("\),|],|',", lambda x: "%s\n" % x.group(),
-                        str(tableContents[rowIndex].get_rules()) ))
+                        str(self.tableContents[rowIndex].get_rules()) ))
 
                 if ok:
-                    tableContents[rowIndex].rules = eval(rules)
+                    self.tableContents[rowIndex].rules = eval(rules)
             except (IndexError, UnboundLocalError):
                 QMessageBox.warning(self, "Warning", "The row is empty.")
         else:
@@ -371,9 +386,9 @@ class MainWindow(QMainWindow):
                         url=row[3],
                         branch=row[4],
                         rpm_commit=row[5],
-                        rpm_date=int(time.mktime(
+                        rpm_date=str(int(time.mktime(
                                     datetime.strptime(row[6], "%y%m%d")
-                                            .timetuple())),
+                                            .timetuple()))),
                         rules=[("", ""), ("", "")],
                         comment=""
                     ))
@@ -403,7 +418,7 @@ class MainWindow(QMainWindow):
             if fname:
                 try:
                     with open(fname, 'w') as fp:
-                        json.dump([i.dump(mode="raw") for i in tableContents], fp, ensure_ascii=False)
+                        json.dump([i.dump(mode="raw") for i in self.tableContents], fp, ensure_ascii=False)
                     self.statusbar.showMessage("saved successfully")
                 except AttributeError:
                     QMessageBox.warning(self, "Error", "Save file failed.")
@@ -424,6 +439,8 @@ class MainWindow(QMainWindow):
             item.setForeground(Qt.darkGreen)
         elif item.text() == "update":
             item.setForeground(Qt.darkRed)
+        elif item.text() == "error":
+            item.setForeground(Qt.darkYellow)
         elif item.text() == "none":
             item.setForeground(Qt.gray)
 
@@ -455,7 +472,7 @@ class MainWindow(QMainWindow):
 
         # 初始化项目
         for i in range(self.tableRowCount):
-            tableContents.append(Checker())
+            self.tableContents.append(Checker())
             for j in range(self.tableColumnCount):
                 item = QTableWidgetItem()
                 self.tableWidget.setItem(i, j, item)
@@ -492,9 +509,9 @@ class Checker(object):
         elif len(str(timestamp)) == 6:
             # string -> timestamp
             #int(datetime.strptime(str(timestamp), "%y%m%d").timestamp())  # Python 3
-            return int(time.mktime(
+            return str(int(time.mktime(
                         datetime.strptime(str(timestamp), "%y%m%d")\
-                                .timetuple()))
+                                .timetuple())))
         else:
             return timestamp
 
@@ -566,10 +583,8 @@ class Checker(object):
         if re.search('github', self.url):
             self.type = "github"
             return [self.url + '/releases', self.url + '/commits/' + self.branch]
-        elif re.search('sogou', self.url):
-            return [self.url]
         else:
-            return [self.url, self.url]
+            return [self.url]
 
     def get_rules(self):
         """获取 xpath 规则"""
@@ -590,19 +605,22 @@ class Checker(object):
         _data = []
         resp = self.get(url)
         if not resp.ok:
-            return ("none", "error")
+            return ("error", "error")  # 网络错误
 
         logging.debug("rules: %s, %s" % (rules[0], rules[1]))
         tree = etree.HTML(resp.text)
         if isinstance(rules, (list, tuple)):
             for rule in rules:
                 if not rule:
-                    _data.append("")
+                    _data.append("none")  # 无规则
                     break
 
-                logging.debug("match: %s" % tree.xpath(rule)[0])
-                _data.append(
-                    self._process_data(tree.xpath(rule)[0]))
+                try:
+                    logging.debug("match: %s" % tree.xpath(rule)[0])
+                    _data.append(
+                        self._process_data(tree.xpath(rule)[0]))
+                except IndexError:
+                    _data.append("error")  # 规则匹配错误
 
             return _data  # (date, commit)
 
@@ -610,7 +628,7 @@ class Checker(object):
         """处理数据"""
         try:
             dt = parse(data)
-            return int(time.mktime(dt.timetuple()))  # int(dt.timestamp())
+            return str(int(time.mktime(dt.timetuple())))  # int(dt.timestamp())
         except ValueError:
             return data.split("/")[-1][:7]  # commit
         except IndexError:  # no data
@@ -646,8 +664,14 @@ class Checker(object):
 
         self._check_update()
 
-        if self.rpm_date == self.latest_date or self.rpm_date >= self.release_date:
+        if self.rpm_date == self.latest_date or \
+                self.rpm_date >= self.release_date:
             self.status = "normal"
+        elif self.rpm_date == self.latest_date and \
+                self.release_date == "error":
+            self.status = "normal"
+        elif self.latest_date == "error":
+            self.status = "error"
         else:
             self.status = "update"
 
