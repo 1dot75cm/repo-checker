@@ -7,15 +7,15 @@ sip.setapi("QString", 2)
 try:
     from PyQt5.QtCore import Qt, QSize, QRect, QThread, pyqtSignal, QUrl
     from PyQt5.QtWidgets import (QApplication, qApp, QMainWindow, QHBoxLayout, QVBoxLayout,
-        QAction, QSpacerItem, QSizePolicy, QMenuBar, QMenu, QStatusBar,
-        QWidget, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QProgressBar,
+        QAction, QSpacerItem, QSizePolicy, QMenuBar, QMenu, QStatusBar, QWidget,
+        QPushButton, QLabel, QTableWidget, QTableWidgetItem, QProgressBar,
         QInputDialog, QFileDialog, QMessageBox)
     from PyQt5.QtGui import QColor, QDesktopServices
 except:
     from PyQt4.QtCore import Qt, QSize, QRect, QThread, pyqtSignal, QUrl
     from PyQt4.QtGui import (QApplication, qApp, QMainWindow, QHBoxLayout, QVBoxLayout,
-        QAction, QSpacerItem, QSizePolicy, QMenuBar, QMenu, QStatusBar,
-        QWidget, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QProgressBar,
+        QAction, QSpacerItem, QSizePolicy, QMenuBar, QMenu, QStatusBar, QWidget,
+        QPushButton, QLabel, QTableWidget, QTableWidgetItem, QProgressBar,
         QInputDialog, QFileDialog, QMessageBox, QColor, QDesktopServices)
 
 from queue import Queue
@@ -293,7 +293,7 @@ class MainWindow(QMainWindow):
 
     def delRowSlot(self):
         """删除行"""
-        #焦点默认在第一行，要设置setFocusPolicy(Qt.NoFocus)
+        # 焦点默认在第一行，要设置setFocusPolicy(Qt.NoFocus)
         rowIndex = self.tableWidget.currentRow()
         if rowIndex != -1:
             self.tableWidget.removeRow(rowIndex)
@@ -333,7 +333,7 @@ class MainWindow(QMainWindow):
             self.taskVal += val
             self.progressVal = self.taskVal / len(self.tableContents) * 100
             self.progressBar.setValue(self.progressVal)
-            self.label.setText("%s/%s"%(self.taskVal, len(self.tableContents)))
+            self.label.setText("%s/%s" % (self.taskVal, len(self.tableContents)))
         self.tableWidget.setRowCount(len(self.tableContents))  # 行数
 
         for n, i in enumerate(self.tableContents):
@@ -414,7 +414,8 @@ class MainWindow(QMainWindow):
                     try:  # load csv file (old format)
                         self.loadCsvFile(fname)
                     except:
-                        QMessageBox.warning(self, "Error", "The file does not contain JSON or CSV.")
+                        QMessageBox.warning(self, "Error",
+                            "The file does not contain JSON or CSV.")
 
                 self.updateTableSlot(0)  # 更新列表控件
                 self.statusbar.showMessage("open successfully")
@@ -424,7 +425,8 @@ class MainWindow(QMainWindow):
             if fname:
                 try:
                     with open(fname, 'w') as fp:
-                        json.dump([i.dump(mode="raw") for i in self.tableContents], fp, ensure_ascii=False)
+                        json.dump([i.dump(mode="raw") for i in self.tableContents],
+                                  fp, ensure_ascii=False)
                     self.statusbar.showMessage("saved successfully")
                 except AttributeError:
                     QMessageBox.warning(self, "Error", "Save file failed.")
@@ -465,7 +467,7 @@ class MainWindow(QMainWindow):
 
         # 行头
         for i in range(self.tableRowCount):
-            item = QTableWidgetItem("%s"%(i+1))
+            item = QTableWidgetItem("%s" % (i+1))
             self.tableWidget.setVerticalHeaderItem(i, item)  # 行号
 
         # 列头
