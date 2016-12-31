@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function, unicode_literals
+from __future__ import print_function, division
 try:
     from PyQt5.QtCore import Qt, QSize, QRect, QThread, pyqtSignal
     from PyQt5.QtWidgets import (QApplication, QMainWindow, QHBoxLayout, QVBoxLayout,
@@ -129,7 +129,7 @@ class MainWindow(QMainWindow):
         self.label = QLabel(self.centralwidget)
         self.horizontalLayout.addWidget(self.label)
 
-        spacerItem = QSpacerItem(40, 20, QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
+        spacerItem = QSpacerItem(40, 20, QSizePolicy.Minimum, QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
 
         self.checkButton = QPushButton(self.centralwidget)
@@ -303,6 +303,7 @@ class MainWindow(QMainWindow):
         self.progressBar.setValue(0)
         self.progressBar.show()
         self.progressVal = 0
+        self.taskVal = 0
 
         for t in range(self.workerCount):
             t = WorkThread(self.q)  # 耗时任务需要用线程执行，再刷新进度条
@@ -316,10 +317,11 @@ class MainWindow(QMainWindow):
 
     def updateTableSlot(self, val):
         """线程通过该槽，刷新进度条，表格内容"""
-        self.taskVal += val
-        self.progressVal = self.taskVal / len(self.tableContents) * 100
-        self.progressBar.setValue(self.progressVal)
-        self.label.setText("%s/%s"%(self.taskVal, len(self.tableContents)))
+        if val:
+            self.taskVal += val
+            self.progressVal = self.taskVal / len(self.tableContents) * 100
+            self.progressBar.setValue(self.progressVal)
+            self.label.setText("%s/%s"%(self.taskVal, len(self.tableContents)))
         self.tableWidget.setRowCount(len(self.tableContents))  # 行数
 
         for n, i in enumerate(self.tableContents):
@@ -381,17 +383,7 @@ class MainWindow(QMainWindow):
             content = csv.reader(fp, delimiter=',', quotechar='|')
             for row in content:
                 if len(row) and row[0][0] != "#":
-                    _data.append(dict(
-                        name=row[2],
-                        url=row[3],
-                        branch=row[4],
-                        rpm_commit=row[5],
-                        rpm_date=str(int(time.mktime(
-                                    datetime.strptime(row[6], "%y%m%d")
-                                            .timetuple()))),
-                        rules=[("", ""), ("", "")],
-                        comment=""
-                    ))
+                    _data.append(row)
             self.loadData(_data)
 
     def showFileDialogSlot(self):
@@ -404,7 +396,7 @@ class MainWindow(QMainWindow):
                         self.loadData(json.load(fp))
                 except AttributeError:
                     QMessageBox.warning(self, "Error", "Open file failed.")
-                except json.decoder.JSONDecodeError:
+                except:  # json.decoder.JSONDecodeError Python 3
                     try:  # load csv file (old format)
                         self.loadCsvFile(fname)
                     except:
@@ -481,15 +473,27 @@ class MainWindow(QMainWindow):
 
 
 class Checker(object):
+    mktimestamp = lambda _, ts: str(int(time.mktime(
+        datetime.strptime(str(ts), "%y%m%d").timetuple())))
+
     def __init__(self, item=None):
-        self.name = item['name'] if item else ""
-        self.url = item['url'] if item else ""
-        self.branch = item['branch'] if item else ""
-        self.rpm_date = item['rpm_date'] if item else "none"
-        self.rpm_commit = item['rpm_commit'] if item else "none"
-        self.rules = item['rules'] if item else [("", ""), ("", "")]
-        #self.urls = item['urls']
-        self.comment = item['comment'] if item else ""
+        if isinstance(item, list):  # csv
+            self.name = item[2]
+            self.url = item[3]
+            self.branch = item[4]
+            self.rpm_commit = item[5]
+            self.rpm_date = self.mktimestamp(item[6])
+            self.rules = [("", ""), ("", "")]
+            self.comment = ""
+
+        else:  # json
+            self.name = item["name"] if item else ""
+            self.url = item["url"] if item else ""
+            self.branch = item["branch"] if item else ""
+            self.rpm_date = item["rpm_date"] if item else "none"
+            self.rpm_commit = item["rpm_commit"] if item else "none"
+            self.rules = item["rules"] if item else [("", ""), ("", "")]
+            self.comment = item["comment"] if item else ""
 
         self.release_date = "none"
         self.release_commit = "none"
@@ -499,8 +503,7 @@ class Checker(object):
         self.check_date = ""
         self.type = ""
 
-    @staticmethod
-    def ctime(timestamp):
+    def ctime(self, timestamp):
         """Convert time format"""
         if len(str(timestamp)) == 10:
             # timestamp -> string
@@ -508,10 +511,7 @@ class Checker(object):
                            .strftime("%y%m%d")
         elif len(str(timestamp)) == 6:
             # string -> timestamp
-            #int(datetime.strptime(str(timestamp), "%y%m%d").timestamp())  # Python 3
-            return str(int(time.mktime(
-                        datetime.strptime(str(timestamp), "%y%m%d")\
-                                .timetuple())))
+            return self.mktimestamp(timestamp)
         else:
             return timestamp
 
