@@ -1,18 +1,22 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function, division
+from __future__ import print_function, division, unicode_literals
+import sip
+# 切换到 QString v2 API 删除和字符串相关的 QT 类，以便在任何地方直接使用 Python 字符串
+sip.setapi("QString", 2)
+
 try:
-    from PyQt5.QtCore import Qt, QSize, QRect, QThread, pyqtSignal
-    from PyQt5.QtWidgets import (QApplication, QMainWindow, QHBoxLayout, QVBoxLayout,
+    from PyQt5.QtCore import Qt, QSize, QRect, QThread, pyqtSignal, QUrl
+    from PyQt5.QtWidgets import (QApplication, qApp, QMainWindow, QHBoxLayout, QVBoxLayout,
         QAction, QSpacerItem, QSizePolicy, QMenuBar, QMenu, QStatusBar,
         QWidget, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QProgressBar,
         QInputDialog, QFileDialog, QMessageBox)
-    from PyQt5.QtGui import QColor
+    from PyQt5.QtGui import QColor, QDesktopServices
 except:
-    from PyQt4.QtCore import Qt, QSize, QRect, QThread, pyqtSignal
-    from PyQt4.QtGui import (QApplication, QMainWindow, QHBoxLayout, QVBoxLayout,
+    from PyQt4.QtCore import Qt, QSize, QRect, QThread, pyqtSignal, QUrl
+    from PyQt4.QtGui import (QApplication, qApp, QMainWindow, QHBoxLayout, QVBoxLayout,
         QAction, QSpacerItem, QSizePolicy, QMenuBar, QMenu, QStatusBar,
         QWidget, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QProgressBar,
-        QInputDialog, QFileDialog, QMessageBox, QColor)
+        QInputDialog, QFileDialog, QMessageBox, QColor, QDesktopServices)
 
 from queue import Queue
 from lxml import etree
@@ -100,23 +104,23 @@ class MainWindow(QMainWindow):
 
         self.addButton = QPushButton(self.centralwidget)
         self.addButton.setFixedSize(QSize(25, 25))
-        self.addButton.setText(self.tr("+"))
+        self.addButton.setText("+")
         self.horizontalLayout.addWidget(self.addButton)
 
         self.delButton = QPushButton(self.centralwidget)
         self.delButton.setFixedSize(QSize(25, 25))
-        self.delButton.setText(self.tr("-"))
+        self.delButton.setText("-")
         self.horizontalLayout.addWidget(self.delButton)
 
         self.upButton = QPushButton(self.centralwidget)
         self.upButton.setFixedSize(QSize(25, 25))
-        self.upButton.setText(self.tr("↑"))
+        self.upButton.setText("↑")
         self.upButton.setObjectName("up")
         self.horizontalLayout.addWidget(self.upButton)
 
         self.downButton = QPushButton(self.centralwidget)
         self.downButton.setFixedSize(QSize(25, 25))
-        self.downButton.setText(self.tr("↓"))
+        self.downButton.setText("↓")
         self.horizontalLayout.addWidget(self.downButton)
 
         spacerItem = QSpacerItem(40, 20, QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
@@ -216,6 +220,7 @@ class MainWindow(QMainWindow):
         self.closeAction.triggered.connect(self.tableWidget.clearContents)
         self.exitAction.triggered.connect(self.close)
         self.tableWidget.itemChanged.connect(self.itemChangedSlot)
+        self.tableWidget.itemClicked.connect(self.itemClickedForOpenUrlSlot)
 
     def closeEvent(self, event):
         """关闭应用提示"""
@@ -227,6 +232,13 @@ class MainWindow(QMainWindow):
             event.accept()  # 接受关闭事件
         else:
             event.ignore()  # 拒绝关闭事件
+
+    def itemClickedForOpenUrlSlot(self, item):
+        """Ctrl+left 打开链接"""
+        # http://stackoverflow.com/questions/3100090/
+        if item.column() == 1 and item.text() and \
+                qApp.keyboardModifiers() == Qt.ControlModifier:
+            QDesktopServices.openUrl(QUrl(item.text()))  # open url
 
     def itemChangedSlot(self, item):  # QTableWidgetItem
         """捕获itemChanged信号, 修改表项"""
@@ -328,6 +340,8 @@ class MainWindow(QMainWindow):
             items = i.dump()
             for j in range(self.tableWidget.columnCount()):
                 item = QTableWidgetItem(items[j])
+                if j in [0, 1]:
+                    item.setToolTip(item.text())
                 self.tableWidget.setItem(n, j, item)
             self.setStatusColor(n)
 
@@ -380,7 +394,7 @@ class MainWindow(QMainWindow):
         """load csv file (old format)"""
         _data = []
         with open(fname, 'r') as fp:
-            content = csv.reader(fp, delimiter=',', quotechar='|')
+            content = csv.reader(fp)
             for row in content:
                 if len(row) and row[0][0] != "#":
                     _data.append(row)
@@ -451,7 +465,7 @@ class MainWindow(QMainWindow):
 
         # 行头
         for i in range(self.tableRowCount):
-            item = QTableWidgetItem(self.tr("%s"%(i+1)))
+            item = QTableWidgetItem("%s"%(i+1))
             self.tableWidget.setVerticalHeaderItem(i, item)  # 行号
 
         # 列头
