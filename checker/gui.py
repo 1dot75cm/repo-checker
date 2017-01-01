@@ -57,15 +57,6 @@ class WorkThread(QThread):
 
 
 class MainWindow(QMainWindow):
-    description = """<b>Checker</b><br /><br />
-    Version: %s<br />
-    %s<br /><br />
-    Project: <a href="%s">1dot75cm/repo-checker</a><br />
-    License: %s<br />
-    Author: <a href="mailto:%s">%s</a>
-    """ % (__version__, __descript__, __url__, __license__, __email__, __author__)
-    tableHeaders = ["Name", "URL", "Branch", "RPM date/commit", "Release date/commit",
-                    "Latest date/commit", "Status", "Comment"]
     tableContents = []
     tableColumnCount = 8
     tableRowCount = 10
@@ -79,6 +70,16 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super(MainWindow, self).__init__()
+        self.description = """<b>Checker</b><br /><br />
+            Version: %s<br />
+            %s<br /><br />
+            Project: <a href=\"%s\">1dot75cm/repo-checker</a><br />
+            License: %s<br />
+            Author: <a href=\"mailto:%s\">%s</a>""" % (__version__,
+            __descript__, __url__, __license__, __email__, __author__)
+        self.tableHeaders = [self.tr("Name"), self.tr("URL"), self.tr("Branch"),
+                             self.tr("RPM date [commit]"), self.tr("Release date [commit]"),
+                             self.tr("Latest date [commit]"), self.tr("Status"), self.tr("Comment")]
         self.setupUi(self)
 
     def setupUi(self, MainWindow):
@@ -172,12 +173,12 @@ class MainWindow(QMainWindow):
         self.openAction = QAction(MainWindow)
         self.openAction.setText(self.tr("&Open"))
         self.openAction.setShortcut('Ctrl+O')
-        self.openAction.setStatusTip('Open a file')
+        self.openAction.setStatusTip(self.tr('Open a file'))
         self.openAction.setObjectName("open")
         self.saveAction = QAction(MainWindow)
         self.saveAction.setText(self.tr("&Save"))
         self.saveAction.setShortcut('Ctrl+S')
-        self.saveAction.setStatusTip('Save a file')
+        self.saveAction.setStatusTip(self.tr('Save a file'))
         self.saveAction.setObjectName("save")
         self.saveAsAction = QAction(MainWindow)
         self.saveAsAction.setText(self.tr("Save As"))
@@ -185,11 +186,11 @@ class MainWindow(QMainWindow):
         self.closeAction = QAction(MainWindow)
         self.closeAction.setText(self.tr("&Close"))
         self.closeAction.setShortcut('Ctrl+W')
-        self.closeAction.setStatusTip('Close current page')
+        self.closeAction.setStatusTip(self.tr('Close current page'))
         self.exitAction = QAction(MainWindow)
         self.exitAction.setText(self.tr("&Exit"))
         self.exitAction.setShortcut('Ctrl+Q')
-        self.exitAction.setStatusTip('Exit application')
+        self.exitAction.setStatusTip(self.tr('Exit application'))
 
         self.helpMenu.addAction(self.aboutAction)
         self.helpMenu.addAction(self.aboutQtAction)
@@ -224,8 +225,8 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event):
         """关闭应用提示"""
-        reply = QMessageBox.question(self, 'Message',
-            "Are you sure to quit?", QMessageBox.Yes |
+        reply = QMessageBox.question(self, self.tr('Message'),
+            self.tr("Are you sure to quit?"), QMessageBox.Yes |
             QMessageBox.No, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
@@ -261,9 +262,9 @@ class MainWindow(QMainWindow):
                 log.debug(self.tableContents)
         except AttributeError:
             if self.sender().objectName() == "up":
-                QMessageBox.warning(self, "Warning", "The row is to top.")
+                QMessageBox.warning(self, self.tr("Warning"), self.tr("The row is to top."))
             else:
-                QMessageBox.warning(self, "Warning", "The row is to bottom.")
+                QMessageBox.warning(self, self.tr("Warning"), self.tr("The row is to bottom."))
 
     def getRow(self, rowIndex):
         """获取行"""
@@ -300,7 +301,7 @@ class MainWindow(QMainWindow):
             self.tableContents.remove(self.tableContents[rowIndex])
             log.debug(self.tableContents)
         else:
-            QMessageBox.warning(self, "Warning", "Please select a row.")
+            QMessageBox.warning(self, self.tr("Warning"), self.tr("Please select a row."))
 
     def loadData(self, data):
         """载入数据"""
@@ -311,7 +312,7 @@ class MainWindow(QMainWindow):
     def checkUpdateSlot(self):
         """执行更新检查"""
         self.wtime[0] = int(time.time())  # 计时
-        self.statusbar.showMessage("checking...")
+        self.statusbar.showMessage(self.tr("checking..."))
         self.progressBar.setValue(0)
         self.progressBar.show()
         self.progressVal = 0
@@ -349,8 +350,8 @@ class MainWindow(QMainWindow):
 
         if self.progressVal == 100:
             self.wtime[1] = int(time.time())
-            self.statusbar.showMessage(
-                "finished (work time %ds)" % (self.wtime[1] - self.wtime[0]))
+            self.statusbar.showMessage(self.tr(
+                "finished (work time %ds)" % (self.wtime[1] - self.wtime[0])))
 
     def updateTableItemSlot(self):
         """更新指定的 RPM 日期为 Release 日期"""
@@ -361,9 +362,9 @@ class MainWindow(QMainWindow):
                 self.tableWidget.item(rowIndex, 3).setText(item.text())
                 self.tableContents[rowIndex].load_status(item.text())
             except (IndexError, AttributeError):
-                QMessageBox.warning(self, "Warning", "The row is empty.")
+                QMessageBox.warning(self, self.tr("Warning"), self.tr("The row is empty."))
         else:
-            QMessageBox.warning(self, "Warning", "Please select a row.")
+            QMessageBox.warning(self, self.tr("Warning"), self.tr("Please select a row."))
 
     def editTableItemRuleSlot(self):
         """编辑列表项规则"""
@@ -371,24 +372,24 @@ class MainWindow(QMainWindow):
         if rowIndex != -1:
             try:
                 # 父控件, 标题, 标签提示, 默认值, window flags
-                rules, ok = QInputDialog.getMultiLineText(self, "Edit rule",
-                    "XPath rule(format: \"[(time, commit), (time, commit)]\"):",
+                rules, ok = QInputDialog.getMultiLineText(self, self.tr("Edit rule"),
+                    self.tr("XPath rule(format: \"[(time, commit), (time, commit)]\"):"),
                     re.sub("\),|],|',", lambda x: "%s\n" % x.group(),
                         str(self.tableContents[rowIndex].get_rules()) ))
 
                 if ok:
                     self.tableContents[rowIndex].rules = eval(rules)
             except (IndexError, UnboundLocalError):
-                QMessageBox.warning(self, "Warning", "The row is empty.")
+                QMessageBox.warning(self, self.tr("Warning"), self.tr("The row is empty."))
         else:
-            QMessageBox.warning(self, "Warning", "Please select a row.")
+            QMessageBox.warning(self, self.tr("Warning"), self.tr("Please select a row."))
 
     def showAboutDialogSlot(self):
         """显示关于对话框"""
         if self.sender().objectName() == "about":
-            QMessageBox.about(self, "Checker", self.description)
+            QMessageBox.about(self, self.tr("Checker"), self.description)
         else:
-            QMessageBox.aboutQt(self, "Checker")
+            QMessageBox.aboutQt(self, self.tr("Checker"))
 
     def loadCsvFile(self, fname):
         """load csv file (old format)"""
@@ -403,33 +404,33 @@ class MainWindow(QMainWindow):
     def showFileDialogSlot(self):
         """打开/保存数据至文件"""
         if self.sender().objectName() == "open":
-            fname, _ = QFileDialog.getOpenFileName(self, "Open file", os.getcwd())
+            fname, _ = QFileDialog.getOpenFileName(self, self.tr("Open file"), os.getcwd())
             if fname:
                 try:
                     with open(fname, 'r') as fp:
                         self.loadData(json.load(fp))
                 except AttributeError:
-                    QMessageBox.warning(self, "Error", "Open file failed.")
+                    QMessageBox.warning(self, self.tr("Error"), self.tr("Open file failed."))
                 except:  # json.decoder.JSONDecodeError Python 3
                     try:  # load csv file (old format)
                         self.loadCsvFile(fname)
                     except:
-                        QMessageBox.warning(self, "Error",
-                            "The file does not contain JSON or CSV.")
+                        QMessageBox.warning(self, self.tr("Error"),
+                            self.tr("The file does not contain JSON or CSV."))
 
                 self.updateTableSlot(0)  # 更新列表控件
-                self.statusbar.showMessage("open successfully")
+                self.statusbar.showMessage(self.tr("open successfully"))
 
         elif self.sender().objectName() in ["save", "save_as"]:
-            fname, _ = QFileDialog.getSaveFileName(self, "Save file", os.getcwd())
+            fname, _ = QFileDialog.getSaveFileName(self, self.tr("Save file"), os.getcwd())
             if fname:
                 try:
                     with open(fname, 'w') as fp:
                         json.dump([i.dump(mode="raw") for i in self.tableContents],
                                   fp, ensure_ascii=False)
-                    self.statusbar.showMessage("saved successfully")
+                    self.statusbar.showMessage(self.tr("saved successfully"))
                 except AttributeError:
-                    QMessageBox.warning(self, "Error", "Save file failed.")
+                    QMessageBox.warning(self, self.tr("Error"), self.tr("Save file failed."))
 
     def setBackgroundColor(self, color):
         """修改背景色"""
@@ -472,7 +473,7 @@ class MainWindow(QMainWindow):
 
         # 列头
         for i in range(self.tableColumnCount):
-            item = QTableWidgetItem(self.tr(self.tableHeaders[i]))  # QIcon, str
+            item = QTableWidgetItem(self.tableHeaders[i])  # QIcon, str
             self.tableWidget.setHorizontalHeaderItem(i, item)  # 初始化表头
 
         for i in [3, 4, 5]:

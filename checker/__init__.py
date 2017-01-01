@@ -9,17 +9,21 @@ from __future__ import division
 from __future__ import absolute_import
 
 try:
+    from PyQt5.QtCore import QTranslator
     from PyQt5.QtWidgets import QApplication
 except:
+    from PyQt4.QtCore import QTranslator
     from PyQt4.QtGui import QApplication
 
 import argparse
 import sys
+import locale
 
 
-__url__ = "https://github.com/1dot75cm/repo-checker"
+__pkgname__ = "repo-checker"
 __version__ = "0.1.0"
 __license__ = "MIT"
+__url__ = "https://github.com/1dot75cm/repo-checker"
 __descript__ = "A graphical user interface version checker tool for open source project."
 __author__ = "mosquito"
 __email__ = "sensor.wen@gmail.com"
@@ -36,6 +40,9 @@ def helper():
     parser.add_argument("-g", "--gui", dest="gui",
                         help="run as graphical user interface (default)",
                         action="store_true", default=True)
+    parser.add_argument("-l", "--lang", dest="lang",
+                        help="run as specific language",
+                        action="store", default=locale.getlocale()[0])
     args = parser.parse_args()
 
     if args.version:
@@ -45,15 +52,19 @@ def helper():
         pass
 
     elif args.gui:
-        start_gui()
+        start_gui(args.lang)
 
     sys.exit()
 
 
-def start_gui():
+def start_gui(lang=""):
     from .gui import MainWindow
+    from .const import Constant
 
     app = QApplication(sys.argv)
+    trans = QTranslator()
+    trans.load(lang, Constant.locale_dir)
+    app.installTranslator(trans)
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())

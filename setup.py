@@ -30,15 +30,16 @@ with open('requirements.txt', 'r') as f:
 
 
 setup(
-    name='repo-checker',
+    name=checker.__pkgname__,
     version=checker.__version__,
-    license='MIT',
-    url='https://github.com/1dot75cm/repo-checker',
-    author='mosquito',
-    author_email='sensor.wen@gmail.com',
+    license=checker.__license__,
+    url=checker.__url__,
+    author=checker.__author__,
+    author_email=checker.__email__,
     description=checker.__descript__,
     long_description=open('README.md').read(),
     packages=find_packages(exclude=['tests']),
+    include_package_data=True,
     platforms='any',
     install_requires=install_deps,
     entry_points={
@@ -46,6 +47,7 @@ setup(
             'checker = checker:main'
         ],
     },
+    test_suite="tests",
     tests_require=['pytest'],
     cmdclass={'test': PyTest},
     keywords=['network', 'checker', 'gui'],
