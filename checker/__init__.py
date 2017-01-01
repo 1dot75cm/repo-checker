@@ -24,7 +24,7 @@ __pkgname__ = "repo-checker"
 __version__ = "0.1.0"
 __license__ = "MIT"
 __url__ = "https://github.com/1dot75cm/repo-checker"
-__descript__ = "A graphical user interface version checker tool for open source project."
+__descript__ = "A graphical user interface version checker for open source project."
 __author__ = "mosquito"
 __email__ = "sensor.wen@gmail.com"
 

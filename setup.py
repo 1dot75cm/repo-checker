@@ -37,7 +37,7 @@ setup(
     author=checker.__author__,
     author_email=checker.__email__,
     description=checker.__descript__,
-    long_description=open('README.md').read(),
+    long_description=open('README.rst').read(),
     packages=find_packages(exclude=['tests']),
     include_package_data=True,
     platforms='any',

@@ -1,6 +1,6 @@
 include LICENSE
 include Makefile
-include README.md
+include README.rst
 include locale/*.ts
 include checker/locale/*.qm
 include requirements*.txt
