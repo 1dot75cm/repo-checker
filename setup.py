@@ -7,8 +7,23 @@
 # in the LICENSE file.
 
 from setuptools import setup, find_packages
+from setuptools.command.test import test as TestCommand
+import sys
 import re
 import checker
+
+
+class PyTest(TestCommand):
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = ['-v']
+        self.test_suite = True
+
+    def run_tests(self):
+        import pytest
+        err_code = pytest.main(self.test_args)
+        sys.exit(err_code)
+
 
 with open('requirements.txt', 'r') as f:
     install_deps = re.split("==.*\n", f.read())[0:-1]
@@ -31,6 +46,8 @@ setup(
             'checker = checker:main'
         ],
     },
+    tests_require=['pytest'],
+    cmdclass={'test': PyTest},
     keywords=['network', 'checker', 'gui'],
     # https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
