@@ -1,44 +1,44 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function, division, unicode_literals
+
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+
 import sip
-# 切换到 QString v2 API 删除和字符串相关的 QT 类，以便在任何地方直接使用 Python 字符串
 sip.setapi("QString", 2)
 
 try:
     from PyQt5.QtCore import Qt, QSize, QRect, QThread, pyqtSignal, QUrl
-    from PyQt5.QtWidgets import (QApplication, qApp, QMainWindow, QHBoxLayout, QVBoxLayout,
+    from PyQt5.QtWidgets import (qApp, QMainWindow, QHBoxLayout, QVBoxLayout,
         QAction, QSpacerItem, QSizePolicy, QMenuBar, QMenu, QStatusBar, QWidget,
         QPushButton, QLabel, QTableWidget, QTableWidgetItem, QProgressBar,
         QInputDialog, QFileDialog, QMessageBox)
     from PyQt5.QtGui import QColor, QDesktopServices
 except:
     from PyQt4.QtCore import Qt, QSize, QRect, QThread, pyqtSignal, QUrl
-    from PyQt4.QtGui import (QApplication, qApp, QMainWindow, QHBoxLayout, QVBoxLayout,
+    from PyQt4.QtGui import (qApp, QMainWindow, QHBoxLayout, QVBoxLayout,
         QAction, QSpacerItem, QSizePolicy, QMenuBar, QMenu, QStatusBar, QWidget,
         QPushButton, QLabel, QTableWidget, QTableWidgetItem, QProgressBar,
         QInputDialog, QFileDialog, QMessageBox, QColor, QDesktopServices)
 
 from queue import Queue
-from lxml import etree
-from dateutil.parser import parse
-from datetime import datetime
 import re
 import os
-import sys
 import csv
 import time
 import json
-import requests
-import logging
 
-__url__ = "https://github.com/1dot75cm/repo-checker"
-__version__ = "0.1.0"
-__license__ = "MIT"
-__descript__ = "Checker is a graphical user interface network checker for open source project."
-__author__ = "mosquito"
-__email__ = "sensor.wen@gmail.com"
+from . import __url__
+from . import __version__
+from . import __license__
+from . import __descript__
+from . import __author__
+from . import __email__
+from . import logger
+from .app import Checker
 
-# xpath 规则 -> 处理函数 -> 内容
+log = logger.getLogger(__name__)
 
 
 class WorkThread(QThread):
@@ -258,7 +258,7 @@ class MainWindow(QMainWindow):
                 self.setRow(destRow, sourceItems)
                 self.setRow(sourceRow, destItems)
                 self.tableWidget.selectRow(destRow)  # 修改焦点
-                logging.debug(self.tableContents)
+                log.debug(self.tableContents)
         except AttributeError:
             if self.sender().objectName() == "up":
                 QMessageBox.warning(self, "Warning", "The row is to top.")
@@ -289,7 +289,7 @@ class MainWindow(QMainWindow):
         self.tableWidget.setRowCount(rowIndex + 1)
         self.tableContents.append(Checker())
         self.updateTableSlot(0)  # 更新列表控件
-        logging.debug(self.tableContents)
+        log.debug(self.tableContents)
 
     def delRowSlot(self):
         """删除行"""
@@ -298,7 +298,7 @@ class MainWindow(QMainWindow):
         if rowIndex != -1:
             self.tableWidget.removeRow(rowIndex)
             self.tableContents.remove(self.tableContents[rowIndex])
-            logging.debug(self.tableContents)
+            log.debug(self.tableContents)
         else:
             QMessageBox.warning(self, "Warning", "Please select a row.")
 
@@ -486,218 +486,3 @@ class MainWindow(QMainWindow):
                 self.tableWidget.setItem(i, j, item)
 
         self.setBackgroundColor(self.bgColor)
-
-
-class Checker(object):
-    mktimestamp = lambda _, ts: str(int(time.mktime(
-        datetime.strptime(str(ts), "%y%m%d").timetuple())))
-
-    def __init__(self, item=None):
-        if isinstance(item, list):  # csv
-            self.name = item[2]
-            self.url = item[3]
-            self.branch = item[4]
-            self.rpm_commit = item[5]
-            self.rpm_date = self.mktimestamp(item[6])
-            self.rules = [("", ""), ("", "")]
-            self.comment = ""
-
-        else:  # json
-            self.name = item["name"] if item else ""
-            self.url = item["url"] if item else ""
-            self.branch = item["branch"] if item else ""
-            self.rpm_date = item["rpm_date"] if item else "none"
-            self.rpm_commit = item["rpm_commit"] if item else "none"
-            self.rules = item["rules"] if item else [("", ""), ("", "")]
-            self.comment = item["comment"] if item else ""
-
-        self.release_date = "none"
-        self.release_commit = "none"
-        self.latest_date = "none"
-        self.latest_commit = "none"
-        self.status = "none"
-        self.check_date = ""
-        self.type = ""
-
-    def ctime(self, timestamp):
-        """Convert time format"""
-        if len(str(timestamp)) == 10:
-            # timestamp -> string
-            return datetime.fromtimestamp(float(timestamp))\
-                           .strftime("%y%m%d")
-        elif len(str(timestamp)) == 6:
-            # string -> timestamp
-            return self.mktimestamp(timestamp)
-        else:
-            return timestamp
-
-    def _dump_meta(self, dump_type="rpm"):
-        """导出时间/提交信息"""
-        if dump_type == "rpm":
-            return "%s [%s]" % (self.ctime(self.rpm_date), self.rpm_commit)
-        elif dump_type == "release":
-            return "%s [%s]" % (self.ctime(self.release_date), self.release_commit)
-        elif dump_type == "latest":
-            return "%s [%s]" % (self.ctime(self.latest_date), self.latest_commit)
-
-    def _load_meta(self, data, load_type="rpm"):
-        """导入时间/提交信息"""
-        try:
-            if load_type == "rpm":
-                self.rpm_date = self.ctime(data.split()[0])
-                self.rpm_commit = data.split()[1][1:-1]
-            elif load_type == "release":
-                self.release_date = self.ctime(data.split()[0])
-                self.release_commit = data.split()[1][1:-1]
-            elif load_type == "latest":
-                self.latest_date = self.ctime(data.split()[0])
-                self.latest_commit = data.split()[1][1:-1]
-        except ValueError:
-            pass
-
-    def load(self, column, value):
-        """按列导入项"""
-        if column == 0:
-            self.name = value
-        elif column == 1:
-            self.url = value
-        elif column == 2:
-            self.branch = value
-        elif column == 3:
-            self._load_meta(value)
-        elif column == 4:
-            self._load_meta(value, "release")
-        elif column == 5:
-            self._load_meta(value, "latest")
-        elif column == 6:
-            self.status = value
-        elif column == 7:
-            self.comment = value
-        else:
-            self.rules = value
-
-    def dump(self, mode="human"):
-        """输出对象信息"""
-        if mode == "human":
-            return (self.name, self.url, self.branch,
-                    self._dump_meta(), self._dump_meta("release"),
-                    self._dump_meta("latest"), self.status, self.comment)
-
-        elif mode == "raw":
-            return dict(
-                name=self.name,
-                url=self.url,
-                branch=self.branch,
-                rpm_date=self.rpm_date,
-                rpm_commit=self.rpm_commit,
-                rules=self.rules,
-                comment=self.comment
-            )
-
-    def get_urls(self):
-        """获取 url 列表"""
-        if re.search('github', self.url):
-            self.type = "github"
-            return [self.url + '/releases', self.url + '/commits/' + self.branch]
-        else:
-            return [self.url]
-
-    def get_rules(self):
-        """获取 xpath 规则"""
-        return self.rules
-
-    def get(self, url, params=None, **kwargs):
-        headers = {
-            'Accept': '*/*',
-            'Accept-Encoding': 'gzip, deflate',
-            'Connection': 'keep-alive',
-            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 '
-                          '(KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36'
-        }
-        return requests.get(url, params, headers=headers, **kwargs)
-
-    def _extract_info(self, url, rules):
-        """根据规则, 提取更新信息"""
-        _data = []
-        resp = self.get(url)
-        if not resp.ok:
-            return ("error", "error")  # 网络错误
-
-        logging.debug("rules: %s, %s" % (rules[0], rules[1]))
-        tree = etree.HTML(resp.text)
-        if isinstance(rules, (list, tuple)):
-            for rule in rules:
-                if not rule:
-                    _data.append("none")  # 无规则
-                    break
-
-                try:
-                    logging.debug("match: %s" % tree.xpath(rule)[0])
-                    _data.append(
-                        self._process_data(tree.xpath(rule)[0]))
-                except IndexError:
-                    _data.append("error")  # 规则匹配错误
-
-            return _data  # (date, commit)
-
-    def _process_data(self, data):
-        """处理数据"""
-        try:
-            dt = parse(data)
-            return str(int(time.mktime(dt.timetuple())))  # int(dt.timestamp())
-        except ValueError:
-            return data.split("/")[-1][:7]  # commit
-        except IndexError:  # no data
-            return ""
-
-    def isrelease(self, url):
-        if re.search('releases', url):
-            return True
-        elif re.search('sogou', url):
-            return True
-
-        return False
-
-    def _check_update(self):
-        """检查更新"""
-        for i, url in enumerate(self.get_urls()):
-            rules = self.get_rules()[i]
-
-            if self.isrelease(url):
-                self.release_date, self.release_commit = \
-                    self._extract_info(url, rules)
-            else:
-                self.latest_date, self.latest_commit = \
-                    self._extract_info(url, rules)
-
-        self.check_date = int(time.time())
-
-    def run_check(self):
-        """检查更新, 并更新状态"""
-        logging.info("starting...")
-        if not self.rules[0][0]:  # 空行
-            return
-
-        self._check_update()
-
-        if self.rpm_date == self.latest_date or \
-                self.rpm_date >= self.release_date:
-            self.status = "normal"
-        elif self.rpm_date == self.latest_date and \
-                self.release_date == "error":
-            self.status = "normal"
-        elif self.latest_date == "error":
-            self.status = "error"
-        else:
-            self.status = "update"
-
-    def __repr__(self):
-        return "<Checker [%s]>" % self.name
-
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
-    app = QApplication(sys.argv)
-    window = MainWindow()
-    window.show()
-    sys.exit(app.exec_())
