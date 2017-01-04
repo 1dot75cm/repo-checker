@@ -272,14 +272,14 @@ class MainWindow(QMainWindow):
         for i in range(7):
             item = self.tableWidget.item(rowIndex, i)
             rowItems.append(item.text())
-        rowItems.append(self.tableContents[rowIndex].rules)
+        rowItems.append(self.tableContents[rowIndex].get_rules(ui=True))
         return rowItems
 
     def setRow(self, rowIndex, rowItems):
         """设置行"""
         for n, i in enumerate(rowItems):
             if n == len(rowItems) - 1:
-                self.tableContents[rowIndex].rules = i
+                self.tableContents[rowIndex].set_rules(i)
             else:
                 item = self.tableWidget.item(rowIndex, n)
                 item.setText(i)
@@ -375,10 +375,10 @@ class MainWindow(QMainWindow):
                 rules, ok = QInputDialog.getMultiLineText(self, self.tr("Edit rule"),
                     self.tr("XPath rule(format: \"[(time, commit), (time, commit)]\"):"),
                     re.sub("\),|],|',", lambda x: "%s\n" % x.group(),
-                        str(self.tableContents[rowIndex].get_rules()) ))
+                        str(self.tableContents[rowIndex].get_rules(ui=True)) ))
 
                 if ok:
-                    self.tableContents[rowIndex].rules = eval(rules)
+                    self.tableContents[rowIndex].set_rules(rules)
             except (IndexError, UnboundLocalError):
                 QMessageBox.warning(self, self.tr("Warning"), self.tr("The row is empty."))
         else:

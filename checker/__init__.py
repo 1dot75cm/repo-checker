@@ -15,6 +15,9 @@ except:
     from PyQt4.QtCore import QTranslator
     from PyQt4.QtGui import QApplication
 
+from .const import Constant
+from .backend import BackendManager
+
 import argparse
 import sys
 import locale
@@ -27,6 +30,10 @@ __url__ = "https://github.com/1dot75cm/repo-checker"
 __descript__ = "A graphical user interface version checker for open source project."
 __author__ = "mosquito"
 __email__ = "sensor.wen@gmail.com"
+
+
+# load backends
+backmgr = BackendManager()
 
 
 def helper():
@@ -59,7 +66,6 @@ def helper():
 
 def start_gui(lang=""):
     from .gui import MainWindow
-    from .const import Constant
 
     app = QApplication(sys.argv)
     trans = QTranslator()

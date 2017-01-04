@@ -13,6 +13,7 @@ import time
 import requests
 
 from . import logger
+from . import backmgr
 
 log = logger.getLogger(__name__)
 
@@ -20,6 +21,8 @@ log = logger.getLogger(__name__)
 class Checker(object):
     mktimestamp = lambda _, ts: str(int(time.mktime(
         datetime.strptime(str(ts), "%y%m%d").timetuple())))
+
+    backends = backmgr.get_backends()
 
     def __init__(self, item=None):
         if isinstance(item, list):  # csv
@@ -125,15 +128,34 @@ class Checker(object):
 
     def get_urls(self):
         """获取 url 列表"""
-        if re.search('github', self.url):
-            self.type = "github"
-            return [self.url + '/releases', self.url + '/commits/' + self.branch]
-        else:
-            return [self.url]
+        for back in self.backends.keys():
+            ok = self.backends[back].get_urls(self.url, self.branch)
+            if ok: return ok
+            else: continue
 
-    def get_rules(self):
+        return [self.url]
+
+    def get_rules(self, ui=False):
         """获取 xpath 规则"""
-        return self.rules
+        if self.rules[0][0]:
+            return self.rules
+
+        elif not ui:
+            for back in self.backends.values():
+                ok = back.get_rules(self.url)
+                if ok: return ok
+                else: continue
+
+        return [("", ""), ("", "")]  # ui show this
+
+    def set_rules(self, rules):
+        """设置 xpath 规则"""
+        if isinstance(rules, (list, tuple)):
+            self.rules = rules
+        elif isinstance(rules, str):
+            self.rules = eval(rules)
+        else:
+            self.rules = [("", ""), ("", "")]
 
     def get(self, url, params=None, **kwargs):
         headers = {
@@ -180,10 +202,10 @@ class Checker(object):
             return ""
 
     def isrelease(self, url):
-        if re.search('releases', url):
-            return True
-        elif re.search('sogou', url):
-            return True
+        for back in self.backends.values():
+            ok = back.isrelease(url)
+            if ok: return ok
+            else: continue
 
         return False
 
@@ -204,7 +226,8 @@ class Checker(object):
     def run_check(self):
         """检查更新, 并更新状态"""
         log.info("starting...")
-        if not self.rules[0][0]:  # 空行
+        if not self.get_rules()[0][0]:  # 空行
+            log.debug('none rules for %s, skip!' % self.name)
             return
 
         self._check_update()
