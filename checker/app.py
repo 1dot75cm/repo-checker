@@ -60,7 +60,7 @@ class Checker(object):
         else:
             return timestamp
 
-    def _dump_meta(self, dump_type="rpm"):
+    def dump_meta(self, dump_type="rpm"):
         """导出时间/提交信息"""
         if dump_type == "rpm":
             return "%s [%s]" % (self.ctime(self.rpm_date), self.rpm_commit)
@@ -69,7 +69,7 @@ class Checker(object):
         elif dump_type == "latest":
             return "%s [%s]" % (self.ctime(self.latest_date), self.latest_commit)
 
-    def _load_meta(self, data, load_type="rpm"):
+    def load_meta(self, data, load_type="rpm"):
         """导入时间/提交信息"""
         try:
             if load_type == "rpm":
@@ -93,11 +93,11 @@ class Checker(object):
         elif column == 2:
             self.branch = value
         elif column == 3:
-            self._load_meta(value)
+            self.load_meta(value)
         elif column == 4:
-            self._load_meta(value, "release")
+            self.load_meta(value, "release")
         elif column == 5:
-            self._load_meta(value, "latest")
+            self.load_meta(value, "latest")
         elif column == 6:
             self.status = value
         elif column == 7:
@@ -109,8 +109,8 @@ class Checker(object):
         """输出对象信息"""
         if mode == "human":
             return (self.name, self.url, self.branch,
-                    self._dump_meta(), self._dump_meta("release"),
-                    self._dump_meta("latest"), self.status, self.comment)
+                    self.dump_meta(), self.dump_meta("release"),
+                    self.dump_meta("latest"), self.status, self.comment)
 
         elif mode == "raw":
             return dict(

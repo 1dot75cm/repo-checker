@@ -360,7 +360,7 @@ class MainWindow(QMainWindow):
             try:
                 item = self.tableWidget.item(rowIndex, 4)
                 self.tableWidget.item(rowIndex, 3).setText(item.text())
-                self.tableContents[rowIndex].load_status(item.text())
+                self.tableContents[rowIndex].load_meta(item.text())
             except (IndexError, AttributeError):
                 QMessageBox.warning(self, self.tr("Warning"), self.tr("The row is empty."))
         else:
