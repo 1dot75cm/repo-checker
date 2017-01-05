@@ -37,6 +37,7 @@ from . import __author__
 from . import __email__
 from . import logger
 from .app import Checker
+from .const import Constant
 
 log = logger.getLogger(__name__)
 
@@ -60,7 +61,7 @@ class MainWindow(QMainWindow):
     tableContents = []
     tableColumnCount = 8
     tableRowCount = 10
-    workerCount = 5  # 线程数
+    workerCount = Constant.worker_num  # 线程数
     workers = []  # 保存线程对象
     q = Queue()
     wtime = [0, 0]

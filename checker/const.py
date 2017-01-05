@@ -17,3 +17,5 @@ class Constant(object):
 
     conf_dir = os.path.join(os.path.expanduser('~'), '.repo-checker')
     log_path = os.path.join(conf_dir, 'checker.log')
+
+    worker_num = 5

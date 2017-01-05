@@ -5,15 +5,12 @@ from __future__ import unicode_literals
 from __future__ import division
 from __future__ import absolute_import
 
-from lxml import etree
-from dateutil.parser import parse
 from datetime import datetime
-import re
 import time
-import requests
 
 from . import logger
 from . import backmgr
+from .backends import BaseBackend
 
 log = logger.getLogger(__name__)
 
@@ -21,8 +18,6 @@ log = logger.getLogger(__name__)
 class Checker(object):
     mktimestamp = lambda _, ts: str(int(time.mktime(
         datetime.strptime(str(ts), "%y%m%d").timetuple())))
-
-    backends = backmgr.get_backends()
 
     def __init__(self, item=None):
         if isinstance(item, list):  # csv
@@ -49,7 +44,9 @@ class Checker(object):
         self.latest_commit = "none"
         self.status = "none"
         self.check_date = ""
-        self.type = ""
+
+        self.isbackend = backmgr.get_backend(self.url)
+        self.backend = self.isbackend if self.isbackend else BaseBackend()
 
     def ctime(self, timestamp):
         """Convert time format"""
@@ -128,10 +125,8 @@ class Checker(object):
 
     def get_urls(self):
         """获取 url 列表"""
-        for back in self.backends.keys():
-            ok = self.backends[back].get_urls(self.url, self.branch)
-            if ok: return ok
-            else: continue
+        if self.isbackend:
+            return self.backend.get_urls(self.branch)
 
         return [self.url]
 
@@ -141,10 +136,8 @@ class Checker(object):
             return self.rules
 
         elif not ui:
-            for back in self.backends.values():
-                ok = back.get_rules(self.url)
-                if ok: return ok
-                else: continue
+            if self.isbackend:
+                return self.backend.get_rules()
 
         return [("", ""), ("", "")]  # ui show this
 
@@ -157,55 +150,10 @@ class Checker(object):
         else:
             self.rules = [("", ""), ("", "")]
 
-    def get(self, url, params=None, **kwargs):
-        headers = {
-            'Accept': '*/*',
-            'Accept-Encoding': 'gzip, deflate',
-            'Connection': 'keep-alive',
-            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 '
-                          '(KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36'
-        }
-        return requests.get(url, params, headers=headers, **kwargs)
-
-    def _extract_info(self, url, rules):
-        """根据规则, 提取更新信息"""
-        _data = []
-        resp = self.get(url)
-        if not resp.ok:
-            return ("error", "error")  # 网络错误
-
-        log.debug("rules: %s, %s" % (rules[0], rules[1]))
-        tree = etree.HTML(resp.text)
-        if isinstance(rules, (list, tuple)):
-            for rule in rules:
-                if not rule:
-                    _data.append("none")  # 无规则
-                    break
-
-                try:
-                    log.debug("match: %s" % tree.xpath(rule)[0])
-                    _data.append(
-                        self._process_data(tree.xpath(rule)[0]))
-                except IndexError:
-                    _data.append("error")  # 规则匹配错误
-
-            return _data  # (date, commit)
-
-    def _process_data(self, data):
-        """处理数据"""
-        try:
-            dt = parse(data)
-            return str(int(time.mktime(dt.timetuple())))  # int(dt.timestamp())
-        except ValueError:
-            return data.split("/")[-1][:7]  # commit
-        except IndexError:  # no data
-            return ""
-
     def isrelease(self, url):
-        for back in self.backends.values():
-            ok = back.isrelease(url)
+        if self.isbackend:
+            ok = self.backend.isrelease(url)
             if ok: return ok
-            else: continue
 
         return False
 
@@ -216,10 +164,10 @@ class Checker(object):
 
             if self.isrelease(url):
                 self.release_date, self.release_commit = \
-                    self._extract_info(url, rules)
+                    self.backend.extract_info(url, rules)  # 从后端获取信息
             else:
                 self.latest_date, self.latest_commit = \
-                    self._extract_info(url, rules)
+                    self.backend.extract_info(url, rules)
 
         self.check_date = int(time.time())
 
