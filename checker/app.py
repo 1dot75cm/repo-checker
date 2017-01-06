@@ -10,7 +10,7 @@ import time
 
 from . import logger
 from . import backmgr
-from .backends import BaseBackend
+from .backends.custom import CustomBackend
 
 log = logger.getLogger(__name__)
 
@@ -46,7 +46,7 @@ class Checker(object):
         self.check_date = ""
 
         self.isbackend = backmgr.get_backend(self.url)
-        self.backend = self.isbackend if self.isbackend else BaseBackend()
+        self.backend = self.isbackend if self.isbackend else CustomBackend(self.url)
 
     def ctime(self, timestamp):
         """Convert time format"""
@@ -151,9 +151,8 @@ class Checker(object):
             self.rules = [("", ""), ("", "")]
 
     def isrelease(self, url):
-        if self.isbackend:
-            ok = self.backend.isrelease(url)
-            if ok: return ok
+        ok = self.backend.isrelease(url)
+        if ok: return ok
 
         return False
 
