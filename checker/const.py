@@ -20,3 +20,5 @@ class Constant(object):
     user_backend_dir = os.path.join(user_conf_dir, 'backends')
 
     worker_num = 5
+    retry = 2
+    retry_time = 5

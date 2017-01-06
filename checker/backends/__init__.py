@@ -8,6 +8,7 @@ import time
 import re
 
 from .. import logger
+from ..const import Constant
 
 log = logger.getLogger(__name__)
 session = requests.session()
@@ -48,9 +49,16 @@ class BaseBackend(metaclass=ABCMeta):
 
     def extract_info(self, url, rules):
         """根据规则, 提取更新信息"""
-        self.resp = self.get(url)
-        if not self.resp.ok:
-            return ("error", "error")  # 网络错误
+        for i in range(Constant.retry):
+            try:
+                self.resp = self.get(url)
+                if self.resp.ok:
+                    break
+            except Exception as e:
+                log.debug("network error[%s]: %s" % (self.name, e))
+                time.sleep(Constant.retry_time * (i + 1))
+                if i == Constant.retry - 1:
+                    return ("error", "error")  # 网络错误
 
         if self._rule_type == "xpath":
             return self._post_xpath(rules)
