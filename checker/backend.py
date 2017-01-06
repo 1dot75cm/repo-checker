@@ -20,6 +20,8 @@ class BackendManager(object):
     def scan(self):
         modules_file = [b for b in os.listdir(Constant.backend_dir)
                         if re.search('^[a-zA-Z0-9].*.py$', b)]
+        modules_file.extend([b for b in os.listdir(Constant.user_backend_dir)
+                             if re.search('^[a-zA-Z0-9].*.py$', b)])
 
         for module_file in modules_file:
             try:

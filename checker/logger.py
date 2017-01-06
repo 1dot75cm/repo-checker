@@ -11,9 +11,12 @@ import logging
 from .const import Constant
 
 
-FILE_NAME = Constant.log_path
-if not os.path.isdir(Constant.conf_dir):
-    os.mkdir(Constant.conf_dir)
+FILE_NAME = Constant.user_log_path
+if not os.path.isdir(Constant.user_conf_dir):
+    os.mkdir(Constant.user_conf_dir)
+
+if not os.path.isdir(Constant.user_backend_dir):
+    os.mkdir(Constant.user_backend_dir)
 
 with open(FILE_NAME, 'a+') as f:
     f.write('#' * 80)

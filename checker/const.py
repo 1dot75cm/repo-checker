@@ -15,7 +15,8 @@ class Constant(object):
     locale_dir = os.path.join(base_dir, own.module_name, 'locale')
     backend_dir = os.path.join(base_dir, own.module_name, 'backends')
 
-    conf_dir = os.path.join(os.path.expanduser('~'), '.repo-checker')
-    log_path = os.path.join(conf_dir, 'checker.log')
+    user_conf_dir = os.path.join(os.path.expanduser('~'), '.repo-checker')
+    user_log_path = os.path.join(user_conf_dir, 'checker.log')
+    user_backend_dir = os.path.join(user_conf_dir, 'backends')
 
     worker_num = 5
