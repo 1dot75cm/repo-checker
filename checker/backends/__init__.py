@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from lxml import etree
+from abc import ABCMeta, abstractmethod
 from dateutil.parser import parse
+from lxml import etree
 import requests
 import time
 import re
@@ -12,24 +13,25 @@ log = logger.getLogger(__name__)
 session = requests.session()
 
 
-class BaseBackend(object):
+class BaseBackend(metaclass=ABCMeta):
     """base class"""
 
     name = None
     domain = None
 
     def __init__(self):
-        self._rule_type = "xpath"  # default type
+        pass
 
-    @classmethod
-    def get_urls(cls, branch):
+    @abstractmethod
+    def get_urls(self, branch):
         pass  # return [release url, latest url]
 
-    @classmethod
-    def get_rules(cls):
+    @abstractmethod
+    def get_rules(self):
         pass  # return [(release date, commit), (latest date, commit)]
 
     @classmethod
+    @abstractmethod
     def isrelease(cls, url):
         pass  # return bool
 

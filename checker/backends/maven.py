@@ -29,8 +29,7 @@ class MavenBackend(BaseBackend):
 
     def _post_regex(self, rules):
         log.debug("rules: %s, %s" % (rules[0], rules[1]))
-        pattern = '\d{4}-\d{2}-\d{2}'
-        time = re.findall(pattern, self.resp.text)
+        time = re.findall(rules[0], self.resp.text)
         return self._process_data(time), "none"  # (date, commit)
 
     @classmethod
