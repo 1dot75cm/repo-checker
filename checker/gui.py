@@ -5,9 +5,6 @@ from __future__ import unicode_literals
 from __future__ import division
 from __future__ import absolute_import
 
-import sip
-sip.setapi("QString", 2)
-
 try:
     from PyQt5.QtCore import Qt, QSize, QRect, QThread, pyqtSignal, QUrl
     from PyQt5.QtWidgets import (qApp, QMainWindow, QHBoxLayout, QVBoxLayout,
@@ -405,7 +402,9 @@ class MainWindow(QMainWindow):
     def showFileDialogSlot(self):
         """打开/保存数据至文件"""
         if self.sender().objectName() == "open":
-            fname, _ = QFileDialog.getOpenFileName(self, self.tr("Open file"), os.getcwd())
+            fname = QFileDialog.getOpenFileName(self, self.tr("Open file"), os.getcwd())
+            fname = fname[0] if isinstance(fname, tuple) else fname  # qt5 tuple, qt4 str
+
             if fname:
                 try:
                     with open(fname, 'r') as fp:
@@ -423,7 +422,9 @@ class MainWindow(QMainWindow):
                 self.statusbar.showMessage(self.tr("open successfully"))
 
         elif self.sender().objectName() in ["save", "save_as"]:
-            fname, _ = QFileDialog.getSaveFileName(self, self.tr("Save file"), os.getcwd())
+            fname = QFileDialog.getSaveFileName(self, self.tr("Save file"), os.getcwd())
+            fname = fname[0] if isinstance(fname, tuple) else fname  # qt5 tuple, qt4 str
+
             if fname:
                 try:
                     with open(fname, 'w') as fp:

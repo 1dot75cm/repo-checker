@@ -8,6 +8,9 @@ from __future__ import unicode_literals
 from __future__ import division
 from __future__ import absolute_import
 
+import sip
+sip.setapi("QString", 2)
+
 try:
     from PyQt5.QtCore import QTranslator
     from PyQt5.QtWidgets import QApplication

@@ -2,3 +2,4 @@ PyQt5==5.7.1
 requests>=2.12.4
 lxml==3.7.1
 python-dateutil==2.6.0
+six==1.10.0

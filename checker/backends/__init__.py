@@ -5,6 +5,7 @@ from dateutil.parser import parse
 from lxml import etree
 import requests
 import time
+import six
 import re
 
 from .. import logger
@@ -14,7 +15,8 @@ log = logger.getLogger(__name__)
 session = requests.session()
 
 
-class BaseBackend(metaclass=ABCMeta):
+@six.add_metaclass(ABCMeta)
+class BaseBackend(object):
     """base class"""
 
     name = None
