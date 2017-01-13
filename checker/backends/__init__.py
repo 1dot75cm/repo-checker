@@ -2,7 +2,7 @@
 
 from abc import ABCMeta, abstractmethod
 from dateutil.parser import parse
-from lxml import etree
+from lxml import etree, html
 import requests
 import time
 import six
@@ -65,17 +65,26 @@ class BaseBackend(object):
         if self._rule_type == "xpath":
             return self._post_xpath(rules)
 
+        elif self._rule_type == "cssselect":
+            return self._post_cssselect(rules)
+
+        elif self._rule_type == "pyquery":
+            return self._post_pyquery(rules)
+
         elif self._rule_type == "json":
             return self._post_json(rules)
 
         elif self._rule_type == "regex":
             return self._post_regex(rules)
 
+        elif self._rule_type == "bs4":
+            return self._post_bs4(rules)
+
     def _post_xpath(self, rules):
         """对数据进行后处理"""
         _data = []
         log.debug("rules: %s, %s" % (rules[0], rules[1]))
-        tree = etree.HTML(self.resp.content)
+        tree = html.fromstring(self.resp.content)
 
         for rule in rules:
             if not rule:
@@ -85,16 +94,31 @@ class BaseBackend(object):
             try:
                 log.debug("match: %s" % tree.xpath(rule)[0])
                 _data.append(self._process_data(tree.xpath(rule)))
+            except etree.XPathEvalError as e:
+                _data.append(self._process_data(
+                    [i.text_content() for i in tree.cssselect(rule)]))
             except IndexError:
                 _data.append("error")  # 规则匹配错误
 
         return _data  # (date, commit)
+
+    def _post_cssselect(self, rules):
+        """对数据进行后处理"""
+        self._post_xpath(rules)
+
+    def _post_pyquery(self, rules):
+        """对数据进行后处理"""
+        pass
 
     def _post_json(self, rules):
         """对数据进行后处理"""
         pass
 
     def _post_regex(self, rules):
+        """对数据进行后处理"""
+        pass
+
+    def _post_bs4(self, rules):
         """对数据进行后处理"""
         pass
 
