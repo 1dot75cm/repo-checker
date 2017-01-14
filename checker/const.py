@@ -16,8 +16,9 @@ class Constant(object):
     backend_dir = os.path.join(base_dir, own.module_name, 'backends')
 
     user_conf_dir = os.path.join(os.path.expanduser('~'), '.repo-checker')
-    user_log_path = os.path.join(user_conf_dir, 'checker.log')
     user_backend_dir = os.path.join(user_conf_dir, 'backends')
+    user_conf_file = os.path.join(user_conf_dir, 'checker.ini')
+    user_log_file = os.path.join(user_conf_dir, 'checker.log')
 
     worker_num = 5
     retry = 2

@@ -11,7 +11,7 @@ import logging
 from .const import Constant
 
 
-FILE_NAME = Constant.user_log_path
+FILE_NAME = Constant.user_log_file
 if not os.path.isdir(Constant.user_conf_dir):
     os.mkdir(Constant.user_conf_dir)
 

@@ -20,6 +20,8 @@ except:
 
 from .const import Constant
 from .backend import BackendManager
+from .config import config
+from . import logger
 
 import argparse
 import sys
@@ -38,6 +40,9 @@ __email__ = "sensor.wen@gmail.com"
 # load backends
 backmgr = BackendManager()
 
+# log
+log = logger.getLogger(__name__)
+
 
 def helper():
     parser = argparse.ArgumentParser(description=__descript__)
@@ -54,25 +59,27 @@ def helper():
                         help="run as specific language",
                         action="store", default=locale.getlocale()[0])
     args = parser.parse_args()
+    config.load_config(**args.__dict__)
+    log.debug('current config[cli, file, defualts]: %s' % config.opts)
 
-    if args.version:
+    if config['version']:
         print('repo-checker installed version: %s' % __version__)
 
-    elif args.cli:  # TODO: build command line interface
+    elif config['cli']:  # TODO: build command line interface
         pass
 
-    elif args.gui:
-        start_gui(args.lang)
+    elif config['gui']:
+        start_gui()
 
     sys.exit()
 
 
-def start_gui(lang=""):
+def start_gui():
     from .gui import MainWindow
 
     app = QApplication(sys.argv)
     trans = QTranslator()
-    trans.load(lang, Constant.locale_dir)
+    trans.load(config['lang'], Constant.locale_dir)
     app.installTranslator(trans)
     window = MainWindow()
     window.show()
