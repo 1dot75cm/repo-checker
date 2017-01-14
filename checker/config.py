@@ -15,7 +15,8 @@ class Config(object):
         'version': False,
         'cli': False,
         'gui': True,
-        'lang': ''
+        'lang': '',
+        'proxy': {'https': '', 'http': ''}
     }
     _bool = {
         'True': 1, 'enable': 1, 'yes': 1, 'on': 1, '1': 1,
@@ -50,8 +51,16 @@ class Config(object):
                 _dt = {k: cls._bool.get(v, v) for k, v in config.items('main')}
                 cls.file.update({k: v for k, v in _dt.items() if v})
 
+                if cls.file.get('proxy'):
+                    cls.file['proxy'] = {'https': cls.file.get('proxy', ''),
+                                         'http': cls.file.get('proxy', '')}
+
         elif mode is 'cli':
             cls.cli.update({k: v for k, v in kwargs.items() if v})
+
+            if cls.cli.get('proxy'):
+                cls.cli['proxy'] = {'https': cls.cli.get('proxy', ''),
+                                    'http': cls.cli.get('proxy', '')}
 
     @classmethod
     def save_config(cls):

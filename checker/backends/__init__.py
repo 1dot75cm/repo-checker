@@ -10,6 +10,7 @@ import re
 
 from .. import logger
 from ..const import Constant
+from ..config import config
 
 log = logger.getLogger(__name__)
 session = requests.session()
@@ -47,7 +48,7 @@ class BaseBackend(object):
             'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 '
                           '(KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36'
         }
-        return session.get(url, headers=headers, **kwargs)
+        return session.get(url, headers=headers, proxies=config['proxy'], **kwargs)
 
     def extract_info(self, url, rules):
         """根据规则, 提取更新信息"""

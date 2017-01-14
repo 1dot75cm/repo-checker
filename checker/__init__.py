@@ -58,6 +58,9 @@ def helper():
     parser.add_argument("-l", "--lang", dest="lang",
                         help="run as specific language",
                         action="store", default=locale.getlocale()[0])
+    parser.add_argument("-p", "--proxy", dest="proxy", metavar="scheme://host[:port]",
+                        help="use proxy for network access",
+                        action="store", default="")
     args = parser.parse_args()
     config.load_config(**args.__dict__)
     log.debug('current config[cli, file, defualts]: %s' % config.opts)
