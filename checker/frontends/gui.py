@@ -10,14 +10,15 @@ try:
     from PyQt5.QtWidgets import (qApp, QMainWindow, QHBoxLayout, QVBoxLayout,
         QAction, QSpacerItem, QSizePolicy, QMenuBar, QMenu, QStatusBar, QWidget,
         QPushButton, QLabel, QTableWidget, QTableWidgetItem, QProgressBar,
-        QInputDialog, QFileDialog, QMessageBox)
+        QInputDialog, QFileDialog, QInputDialog, QLineEdit, QMessageBox)
     from PyQt5.QtGui import QColor, QDesktopServices
 except:
     from PyQt4.QtCore import Qt, QSize, QRect, QThread, pyqtSignal, QUrl
     from PyQt4.QtGui import (qApp, QMainWindow, QHBoxLayout, QVBoxLayout,
         QAction, QSpacerItem, QSizePolicy, QMenuBar, QMenu, QStatusBar, QWidget,
         QPushButton, QLabel, QTableWidget, QTableWidgetItem, QProgressBar,
-        QInputDialog, QFileDialog, QMessageBox, QColor, QDesktopServices)
+        QInputDialog, QFileDialog, QInputDialog, QLineEdit, QMessageBox,
+        QColor, QDesktopServices)
 
 from queue import Queue
 import re
@@ -35,6 +36,7 @@ from .. import __email__
 from .. import logger
 from ..app import Checker
 from ..config import config
+from ..backends import BaseBackend as backend
 from .settings import SettingDialog
 
 log = logger.getLogger(__name__)
@@ -183,6 +185,10 @@ class MainWindow(QMainWindow):
         self.openAction.setShortcut('Ctrl+O')
         self.openAction.setStatusTip(self.tr('Open a file'))
         self.openAction.setObjectName("open")
+        self.openUrlAction = QAction(MainWindow)
+        self.openUrlAction.setText(self.tr("Open &url"))
+        self.openUrlAction.setShortcut('Ctrl+U')
+        self.openUrlAction.setStatusTip(self.tr('Open a file with url'))
         self.saveAction = QAction(MainWindow)
         self.saveAction.setText(self.tr("&Save"))
         self.saveAction.setShortcut('Ctrl+S')
@@ -208,6 +214,7 @@ class MainWindow(QMainWindow):
         self.helpMenu.addAction(self.aboutQtAction)
         self.toolMenu.addAction(self.settingAction)
         self.fileMenu.addAction(self.openAction)
+        self.fileMenu.addAction(self.openUrlAction)
         self.fileMenu.addSeparator()
         self.fileMenu.addAction(self.saveAction)
         self.fileMenu.addAction(self.saveAsAction)
@@ -228,6 +235,7 @@ class MainWindow(QMainWindow):
         self.aboutAction.triggered.connect(self.showAboutDialogSlot)
         self.aboutQtAction.triggered.connect(self.showAboutDialogSlot)
         self.openAction.triggered.connect(self.showFileDialogSlot)
+        self.openUrlAction.triggered.connect(self.showOpenUrlDialogSlot)
         self.saveAction.triggered.connect(self.showFileDialogSlot)
         self.saveAsAction.triggered.connect(self.showFileDialogSlot)
         self.closeAction.triggered.connect(self.tableWidget.clearContents)
@@ -408,6 +416,20 @@ class MainWindow(QMainWindow):
         else:
             QMessageBox.aboutQt(self, self.tr("Checker"))
 
+    def showOpenUrlDialogSlot(self):
+        """通过 Url 打开文件"""
+        url, _ = QInputDialog.getText(self, self.tr("Open url"),
+                     self.tr("Enter url:"), QLineEdit.Normal, "")
+        try:
+            resp = backend.get(url)
+            self.loadData(resp.json())
+            self.updateTableSlot(0)  # 更新列表控件
+            self.statusbar.showMessage(self.tr("open url successfully"))
+        except Exception as e:
+            QMessageBox.warning(self, self.tr("Error"),
+                                self.tr("Open url failed. See below:\n%s" % e))
+            self.statusbar.showMessage(self.tr("open url failed"))
+
     def loadCsvFile(self, fname):
         """load csv file (old format)"""
         _data = []
@@ -438,7 +460,7 @@ class MainWindow(QMainWindow):
                             self.tr("The file does not contain JSON or CSV."))
 
                 self.updateTableSlot(0)  # 更新列表控件
-                self.statusbar.showMessage(self.tr("open successfully"))
+                self.statusbar.showMessage(self.tr("open file successfully"))
 
         elif self.sender().objectName() in ["save", "save_as"]:
             fname = QFileDialog.getSaveFileName(self, self.tr("Save file"), os.getcwd())
