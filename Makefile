@@ -8,7 +8,7 @@ test:
 gettext:
 	@echo "Generate qm file..."
 	@for i in zh_CN zh_TW; do \
-	    pylupdate5 checker/gui.py -ts locale/$$i.ts; \
+	    pylupdate5 -noobsolete checker/frontends/*.py -ts locale/$$i.ts; \
 	    lrelease-qt5 locale/$$i.ts -qm checker/locale/$$i.qm; \
 	done
 

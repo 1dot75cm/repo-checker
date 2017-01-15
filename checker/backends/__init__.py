@@ -9,7 +9,6 @@ import six
 import re
 
 from .. import logger
-from ..const import Constant
 from ..config import config
 
 log = logger.getLogger(__name__)
@@ -52,15 +51,15 @@ class BaseBackend(object):
 
     def extract_info(self, url, rules):
         """根据规则, 提取更新信息"""
-        for i in range(Constant.retry):
+        for i in range(config['retry']):
             try:
                 self.resp = self.get(url)
                 if self.resp.ok:
                     break
             except Exception as e:
                 log.debug("network error[%s]: %s" % (self.name, e))
-                time.sleep(Constant.retry_time * (i + 1))
-                if i == Constant.retry - 1:
+                time.sleep(config['retry_time'] * (i + 1))
+                if i == config['retry'] - 1:
                     return ("error", "error")  # 网络错误
 
         if self._rule_type == "xpath":

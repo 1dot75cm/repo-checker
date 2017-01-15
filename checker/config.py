@@ -2,11 +2,19 @@
 
 try:
     from ConfigParser import ConfigParser  # Python 2
+    from ConfigParser import _Chainmap
+    class ChainMap(_Chainmap, object):
+        def __init__(self, *args):
+            super(ChainMap, self).__init__(*args)
+            self.maps = [mapping for mapping in self._maps]
 except:
     from configparser import ConfigParser  # Python 3
+    from collections import ChainMap
 
-from collections import ChainMap
-from const import Constant
+from .const import Constant
+from . import logger
+
+log = logger.getLogger(__name__)
 
 
 class Config(object):
@@ -16,7 +24,10 @@ class Config(object):
         'cli': False,
         'gui': True,
         'lang': '',
-        'proxy': {'https': '', 'http': ''}
+        'proxy': {'https': '', 'http': ''},
+        'worker_num': Constant.worker_num,
+        'retry': Constant.retry,
+        'retry_time': Constant.retry_time
     }
     _bool = {
         'True': 1, 'enable': 1, 'yes': 1, 'on': 1, '1': 1,
@@ -49,21 +60,22 @@ class Config(object):
         if mode is 'file':
             if cls._cp.read(Constant.user_conf_file):
                 _dt = {k: cls._bool.get(v, v) for k, v in cls._cp.items('main')}
-                cls.file.update({k: v for k, v in _dt.items() if v})
+                cls.file.update({k: cls._int(v) for k, v in _dt.items() if v})
 
                 if cls.file.get('proxy'):
                     cls.file['proxy'] = {'https': cls.file.get('proxy', ''),
                                          'http': cls.file.get('proxy', '')}
 
         elif mode is 'cli':
-            cls.cli.update({k: v for k, v in kwargs.items() if v})
+            cls.cli.update({k: cls._int(v) for k, v in kwargs.items() if v})
 
             if cls.cli.get('proxy'):
                 cls.cli['proxy'] = {'https': cls.cli.get('proxy', ''),
                                     'http': cls.cli.get('proxy', '')}
 
         elif mode is 'runtime':
-            cls.runtime.update({k: v for k, v in kwargs.items() if v})
+            log.debug('update config: %s' % kwargs)
+            cls.runtime.update({k: cls._int(v) for k, v in kwargs.items() if v})
 
             if cls.runtime.get('proxy'):
                 cls.runtime['proxy'] = {'https': cls.runtime.get('proxy', ''),
@@ -82,6 +94,14 @@ class Config(object):
             cls._cp.set('main', k, val)
 
         cls._cp.write(open(Constant.user_conf_file, 'w'))
+        log.debug('saved config: %s' % cls._cp.items('main'))
+
+    @staticmethod
+    def _int(value):
+        try:
+            return int(value)
+        except ValueError:
+            return value
 
 
 config = Config()

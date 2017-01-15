@@ -78,7 +78,7 @@ def helper():
 
 
 def start_gui():
-    from .gui import MainWindow
+    from .frontends import MainWindow
 
     app = QApplication(sys.argv)
     trans = QTranslator()

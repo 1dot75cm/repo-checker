@@ -26,15 +26,16 @@ import csv
 import time
 import json
 
-from . import __url__
-from . import __version__
-from . import __license__
-from . import __descript__
-from . import __author__
-from . import __email__
-from . import logger
-from .app import Checker
-from .const import Constant
+from .. import __url__
+from .. import __version__
+from .. import __license__
+from .. import __descript__
+from .. import __author__
+from .. import __email__
+from .. import logger
+from ..app import Checker
+from ..config import config
+from .settings import SettingDialog
 
 log = logger.getLogger(__name__)
 
@@ -58,7 +59,7 @@ class MainWindow(QMainWindow):
     tableContents = []
     tableColumnCount = 8
     tableRowCount = 10
-    workerCount = Constant.worker_num  # 线程数
+    workerCount = config['worker_num']  # 线程数
     workers = []  # 保存线程对象
     q = Queue()
     wtime = [0, 0]
@@ -150,13 +151,22 @@ class MainWindow(QMainWindow):
         self.verticalLayout.addLayout(self.horizontalLayout)
         MainWindow.setCentralWidget(self.centralwidget)
 
+        # 菜单
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setGeometry(QRect(0, 0, 780, 34))
+        MainWindow.setMenuBar(self.menubar)
+
         self.fileMenu = QMenu(self.menubar)
         self.fileMenu.setTitle(self.tr("File"))
+        self.menubar.addAction(self.fileMenu.menuAction())
+
+        self.toolMenu = QMenu(self.menubar)
+        self.toolMenu.setTitle(self.tr("Tool"))
+        self.menubar.addAction(self.toolMenu.menuAction())
+
         self.helpMenu = QMenu(self.menubar)
         self.helpMenu.setTitle(self.tr("Help"))
-        MainWindow.setMenuBar(self.menubar)
+        self.menubar.addAction(self.helpMenu.menuAction())
 
         self.statusbar = QStatusBar(MainWindow)
         MainWindow.setStatusBar(self.statusbar)
@@ -189,9 +199,14 @@ class MainWindow(QMainWindow):
         self.exitAction.setText(self.tr("&Exit"))
         self.exitAction.setShortcut('Ctrl+Q')
         self.exitAction.setStatusTip(self.tr('Exit application'))
+        self.settingAction = QAction(MainWindow)
+        self.settingAction.setText(self.tr("&Settings"))
+        self.settingAction.setShortcut('Ctrl+P')
+        self.settingAction.setStatusTip(self.tr('Open settings dialog'))
 
         self.helpMenu.addAction(self.aboutAction)
         self.helpMenu.addAction(self.aboutQtAction)
+        self.toolMenu.addAction(self.settingAction)
         self.fileMenu.addAction(self.openAction)
         self.fileMenu.addSeparator()
         self.fileMenu.addAction(self.saveAction)
@@ -200,8 +215,6 @@ class MainWindow(QMainWindow):
         self.fileMenu.addAction(self.closeAction)
         self.fileMenu.addSeparator()
         self.fileMenu.addAction(self.exitAction)
-        self.menubar.addAction(self.fileMenu.menuAction())
-        self.menubar.addAction(self.helpMenu.menuAction())
 
         # Signal & Slot
         self.addButton.clicked.connect(self.addRowSlot)
@@ -211,6 +224,7 @@ class MainWindow(QMainWindow):
         self.checkButton.clicked.connect(self.checkUpdateSlot)
         self.updateButton.clicked.connect(self.updateTableItemSlot)
         self.editRuleButton.clicked.connect(self.editTableItemRuleSlot)
+        self.settingAction.triggered.connect(self.showSettingDialogSlot)
         self.aboutAction.triggered.connect(self.showAboutDialogSlot)
         self.aboutQtAction.triggered.connect(self.showAboutDialogSlot)
         self.openAction.triggered.connect(self.showFileDialogSlot)
@@ -381,6 +395,11 @@ class MainWindow(QMainWindow):
                 QMessageBox.warning(self, self.tr("Warning"), self.tr("The row is empty."))
         else:
             QMessageBox.warning(self, self.tr("Warning"), self.tr("Please select a row."))
+
+    def showSettingDialogSlot(self):
+        """显示设置对话框"""
+        settingDialog = SettingDialog()
+        settingDialog.exec_()
 
     def showAboutDialogSlot(self):
         """显示关于对话框"""
