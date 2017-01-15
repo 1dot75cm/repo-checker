@@ -20,8 +20,9 @@ class Config(object):
     }
     _bool = {
         'True': 1, 'enable': 1, 'yes': 1, 'on': 1, '1': 1,
-        'False': 0, 'disable': 0, 'no': 0, 'off':0, '0': 0
+        'False': 0, 'disable': 0, 'no': 0, 'off':0, '0': 0, 'None': 0
     }
+    _cp = ConfigParser()
     file = {}  # config file arguments
     cli = {}  # cli arguments
     runtime = {}  # load config from gui
@@ -46,10 +47,8 @@ class Config(object):
         """从配置文件或命令行载入配置"""
 
         if mode is 'file':
-            config = ConfigParser()
-
-            if config.read(Constant.user_conf_file):
-                _dt = {k: cls._bool.get(v, v) for k, v in config.items('main')}
+            if cls._cp.read(Constant.user_conf_file):
+                _dt = {k: cls._bool.get(v, v) for k, v in cls._cp.items('main')}
                 cls.file.update({k: v for k, v in _dt.items() if v})
 
                 if cls.file.get('proxy'):
@@ -72,7 +71,17 @@ class Config(object):
 
     @classmethod
     def save_config(cls):
-        pass
+        """保存配置"""
+        if not cls._cp.has_section('main'):
+            cls._cp.add_section('main')
+
+        for k, v in cls.opts.items():
+            val = str(cls._bool.get(str(v), v))
+            if isinstance(v, dict):
+                val = v['http']
+            cls._cp.set('main', k, val)
+
+        cls._cp.write(open(Constant.user_conf_file, 'w'))
 
 
 config = Config()
