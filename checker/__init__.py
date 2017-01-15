@@ -62,8 +62,8 @@ def helper():
                         help="use proxy for network access",
                         action="store", default="")
     args = parser.parse_args()
-    config.load_config(**args.__dict__)
-    log.debug('current config[cli, file, defualts]: %s' % config.opts)
+    config.load_config(mode="cli", **args.__dict__)
+    log.debug('current config[runtime, cli, file, defualts]: %s' % config().maps)
 
     if config['version']:
         print('repo-checker installed version: %s' % __version__)

@@ -24,7 +24,8 @@ class Config(object):
     }
     file = {}  # config file arguments
     cli = {}  # cli arguments
-    opts = ChainMap(cli, file, defaults)
+    runtime = {}  # load config from gui
+    opts = ChainMap(runtime, cli, file, defaults)
 
     def __init__(self):
         self.load_config(mode='file')
@@ -41,7 +42,7 @@ class Config(object):
         return self.opts.get(key, default)
 
     @classmethod
-    def load_config(cls, mode='cli', **kwargs):
+    def load_config(cls, mode='runtime', **kwargs):
         """从配置文件或命令行载入配置"""
 
         if mode is 'file':
@@ -61,6 +62,13 @@ class Config(object):
             if cls.cli.get('proxy'):
                 cls.cli['proxy'] = {'https': cls.cli.get('proxy', ''),
                                     'http': cls.cli.get('proxy', '')}
+
+        elif mode is 'runtime':
+            cls.runtime.update({k: v for k, v in kwargs.items() if v})
+
+            if cls.runtime.get('proxy'):
+                cls.runtime['proxy'] = {'https': cls.runtime.get('proxy', ''),
+                                        'http': cls.runtime.get('proxy', '')}
 
     @classmethod
     def save_config(cls):
