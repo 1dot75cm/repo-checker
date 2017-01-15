@@ -71,12 +71,12 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super(MainWindow, self).__init__()
-        self.description = """<b>Checker</b><br /><br />
+        self.description = self.tr("""<b>Checker</b><br /><br />
             Version: %s<br />
             %s<br /><br />
             Project: <a href=\"%s\">1dot75cm/repo-checker</a><br />
             License: %s<br />
-            Author: <a href=\"mailto:%s\">%s</a>""" % (__version__,
+            Author: <a href=\"mailto:%s\">%s</a>""") % (__version__,
             __descript__, __url__, __license__, __email__, __author__)
         self.tableHeaders = [self.tr("Name"), self.tr("URL"), self.tr("Branch"),
                              self.tr("RPM date [commit]"), self.tr("Release date [commit]"),
@@ -371,7 +371,7 @@ class MainWindow(QMainWindow):
         if self.progressVal == 100:
             self.wtime[1] = int(time.time())
             self.statusbar.showMessage(self.tr(
-                "finished (work time %ds)" % (self.wtime[1] - self.wtime[0])))
+                "finished (work time %ds)") % (self.wtime[1] - self.wtime[0]))
 
     def updateTableItemSlot(self):
         """更新指定的 RPM 日期为 Release 日期"""
@@ -427,7 +427,7 @@ class MainWindow(QMainWindow):
             self.statusbar.showMessage(self.tr("open url successfully"))
         except Exception as e:
             QMessageBox.warning(self, self.tr("Error"),
-                                self.tr("Open url failed. See below:\n%s" % e))
+                                self.tr("Open url failed. See below:\n%s") % e)
             self.statusbar.showMessage(self.tr("open url failed"))
 
     def loadCsvFile(self, fname):
@@ -450,14 +450,15 @@ class MainWindow(QMainWindow):
                 try:
                     with open(fname, 'r') as fp:
                         self.loadData(json.load(fp))
-                except AttributeError:
-                    QMessageBox.warning(self, self.tr("Error"), self.tr("Open file failed."))
+                except AttributeError as e:
+                    QMessageBox.warning(self, self.tr("Error"),
+                        self.tr("Open file failed. See below:\n%s") % e)
                 except:  # json.decoder.JSONDecodeError Python 3
                     try:  # load csv file (old format)
                         self.loadCsvFile(fname)
-                    except:
+                    except Exception as e:
                         QMessageBox.warning(self, self.tr("Error"),
-                            self.tr("The file does not contain JSON or CSV."))
+                            self.tr("The file does not contain JSON or CSV. See below:\n%s") % e)
 
                 self.updateTableSlot(0)  # 更新列表控件
                 self.statusbar.showMessage(self.tr("open file successfully"))
@@ -472,8 +473,9 @@ class MainWindow(QMainWindow):
                         json.dump([i.dump(mode="raw") for i in self.tableContents],
                                   fp, ensure_ascii=False)
                     self.statusbar.showMessage(self.tr("saved successfully"))
-                except AttributeError:
-                    QMessageBox.warning(self, self.tr("Error"), self.tr("Save file failed."))
+                except AttributeError as e:
+                    QMessageBox.warning(self, self.tr("Error"),
+                        self.tr("Save file failed. See below:\n%s") % e)
 
     def setBackgroundColor(self, color):
         """修改背景色"""
