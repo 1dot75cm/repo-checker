@@ -29,7 +29,7 @@ import locale
 
 
 __pkgname__ = "repo-checker"
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 __license__ = "MIT"
 __url__ = "https://github.com/1dot75cm/repo-checker"
 __descript__ = "A graphical user interface version checker for open source project."
