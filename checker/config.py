@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+
 try:
     from ConfigParser import ConfigParser  # Python 2
     from ConfigParser import _Chainmap
@@ -57,7 +62,7 @@ class Config(object):
     def load_config(cls, mode='runtime', **kwargs):
         """从配置文件或命令行载入配置"""
 
-        if mode is 'file':
+        if mode == 'file':
             if cls._cp.read(Constant.user_conf_file):
                 _dt = {k: cls._bool.get(v, v) for k, v in cls._cp.items('main')}
                 cls.file.update({k: cls._int(v) for k, v in _dt.items() if v})
@@ -66,14 +71,14 @@ class Config(object):
                     cls.file['proxy'] = {'https': cls.file.get('proxy', ''),
                                          'http': cls.file.get('proxy', '')}
 
-        elif mode is 'cli':
+        elif mode == 'cli':
             cls.cli.update({k: cls._int(v) for k, v in kwargs.items() if v})
 
             if cls.cli.get('proxy'):
                 cls.cli['proxy'] = {'https': cls.cli.get('proxy', ''),
                                     'http': cls.cli.get('proxy', '')}
 
-        elif mode is 'runtime':
+        elif mode == 'runtime':
             log.debug('update config: %s' % kwargs)
             cls.runtime.update({k: cls._int(v) for k, v in kwargs.items() if v})
 
