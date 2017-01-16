@@ -143,7 +143,7 @@ class SettingDialog(QDialog):
             'retry': self.retryTimeBox.value(),
             'retry_time': self.retryWaitBox.value(),
             'proxy': "%s://%s" % (self.getRadioBtn(), self.addrEdit.text()) \
-                         if self.getRadioBtn() else ""
+                         if self.getRadioBtn() and self.addrEdit.text() else ""
         })
 
     def saveOptionToFileSlot(self, btn):
